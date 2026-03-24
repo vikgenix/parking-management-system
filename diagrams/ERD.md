@@ -1,3 +1,6 @@
+# Entity Relationship Diagram
+
+```mermaid
 erDiagram
     USERS ||--o{ BOOKINGS : makes
     USERS ||--o{ VEHICLES : registers
@@ -78,3 +81,4 @@ erDiagram
         TIMESTAMP paid_at
         TIMESTAMP created_at
     }
+```
