@@ -24,7 +24,7 @@ Primary actor table. Stores drivers, admins, and operators.
 | Column | Type | Constraints | Notes |
 |---|---|---|---|
 | id | UUID | PK | Auto-generated |
-| name | VARCHAR(100) | NOT NULL | |
+| name | VARCHAR(100) | NOT NULL | 
 | email | VARCHAR(255) | UNIQUE, NOT NULL | Login identifier |
 | phone | VARCHAR(20) | NOT NULL | For SMS notifications |
 | password_hash | TEXT | NOT NULL | bcrypt hash — never plain text |
