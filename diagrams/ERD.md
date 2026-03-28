@@ -24,7 +24,7 @@ erDiagram
 
     VEHICLES {
         ObjectId _id PK
-        ObjectId user_id Ref
+        ObjectId user_id FK
         String plate_number "UNIQUE"
         String vehicle_type
         String model
@@ -43,7 +43,7 @@ erDiagram
 
     FLOORS {
         ObjectId _id PK
-        ObjectId lot_id Ref
+        ObjectId lot_id FK
         Integer floor_number
         String label
         DateTime created_at
@@ -51,7 +51,7 @@ erDiagram
 
     SLOTS {
         ObjectId _id PK
-        ObjectId floor_id Ref
+        ObjectId floor_id FK
         String slot_code
         Enum slot_type
         Enum status
@@ -61,9 +61,9 @@ erDiagram
 
     BOOKINGS {
         ObjectId _id PK
-        ObjectId user_id Ref
-        ObjectId slot_id Ref
-        ObjectId vehicle_id Ref
+        ObjectId user_id FK
+        ObjectId slot_id FK
+        ObjectId vehicle_id FK
         DateTime start_time
         DateTime end_time
         Enum status
@@ -74,7 +74,7 @@ erDiagram
 
     PAYMENTS {
         ObjectId _id PK
-        ObjectId booking_id Ref "UNIQUE"
+        ObjectId booking_id FK "UNIQUE"
         String stripe_payment_id
         Decimal amount
         Enum status
