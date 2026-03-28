@@ -21,112 +21,112 @@
 ### USERS
 Primary actor table. Stores drivers and admins.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | Auto-generated |
-| name | VARCHAR(100) | NOT NULL | 
-| email | VARCHAR(255) | UNIQUE, NOT NULL | Login identifier |
-| phone | VARCHAR(20) | NOT NULL | For SMS notifications |
-| password_hash | TEXT | NOT NULL | bcrypt hash — never plain text |
-| role | ENUM | NOT NULL | driver / admin |
-| is_active | BOOLEAN | DEFAULT true | Soft disable accounts |
-| created_at | TIMESTAMP | DEFAULT now() | |
-| updated_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | Document ID |
+| name | String | Required | |
+| email | String | Unique, Required | Login identifier |
+| phone | String | Required | For SMS notifications |
+| password_hash | String | Required | bcrypt hash — never plain text |
+| role | Enum | Required | driver / admin |
+| is_active | Boolean | Default: true | Soft disable accounts |
+| created_at | DateTime | Default: now() | |
+| updated_at | DateTime | Default: now() | |
 
 ---
 
 ### VEHICLES
 Registered vehicles belonging to a driver.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | |
-| user_id | UUID | FK → USERS.id | |
-| plate_number | VARCHAR(20) | UNIQUE, NOT NULL | Stored uppercase |
-| vehicle_type | VARCHAR(50) | NOT NULL | car / bike / suv |
-| model | VARCHAR(100) | | e.g. Honda City |
-| created_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | |
+| user_id | Link[User] | Ref | Beanie Link to User document |
+| plate_number | String | Unique, Required | Stored uppercase |
+| vehicle_type | String | Required | car / bike / suv |
+| model | String | Optional | e.g. Honda City |
+| created_at | DateTime | Default: now() | |
 
 ---
 
 ### PARKING_LOTS
 Top-level entity representing a physical parking facility.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | |
-| name | VARCHAR(150) | NOT NULL | e.g. Central Park Parking |
-| address | TEXT | NOT NULL | Full address |
-| price_per_hour | DECIMAL(8,2) | NOT NULL | Base rate |
-| total_floors | INT | DEFAULT 1 | |
-| is_active | BOOLEAN | DEFAULT true | |
-| created_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | |
+| name | String | Required | e.g. Central Park Parking |
+| address | String | Required | Full address |
+| price_per_hour | Decimal | Required | Base rate |
+| total_floors | Integer | Default: 1 | |
+| is_active | Boolean | Default: true | |
+| created_at | DateTime | Default: now() | |
 
 ---
 
 ### FLOORS
 A floor within a parking lot.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | |
-| lot_id | UUID | FK → PARKING_LOTS.id | |
-| floor_number | INT | NOT NULL | 0 = ground, 1 = first, etc. |
-| label | VARCHAR(20) | | e.g. "G", "L1", "Basement" |
-| created_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | |
+| lot_id | Link[ParkingLot] | Ref | Beanie Link to ParkingLot |
+| floor_number | Integer | Required | 0 = ground, 1 = first, etc. |
+| label | String | Optional | e.g. "G", "L1", "Basement" |
+| created_at | DateTime | Default: now() | |
 
 ---
 
 ### SLOTS
 Individual parking spaces. Status managed via Redis cache for performance.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | |
-| floor_id | UUID | FK → FLOORS.id | |
-| slot_code | VARCHAR(20) | NOT NULL | e.g. "A-101" |
-| slot_type | ENUM | NOT NULL | standard / compact / handicapped / ev_charging |
-| status | ENUM | DEFAULT available | available / reserved / occupied / inactive |
-| created_at | TIMESTAMP | DEFAULT now() | |
-| updated_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | |
+| floor_id | Link[Floor] | Ref | Beanie Link to Floor |
+| slot_code | String | Required | e.g. "A-101" |
+| slot_type | Enum | Required | standard / compact / handicapped / ev_charging |
+| status | Enum | Default: available | available / reserved / occupied / inactive |
+| created_at | DateTime | Default: now() | |
+| updated_at | DateTime | Default: now() | |
 
-**Index:** `(floor_id, status)` — for fast availability queries
+**Index:** COMPOUND `[("floor_id", 1), ("status", 1)]` — for fast availability queries
 
 ---
 
 ### BOOKINGS
 Central transaction table linking users, slots, and vehicles.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | |
-| user_id | UUID | FK → USERS.id | |
-| slot_id | UUID | FK → SLOTS.id | |
-| vehicle_id | UUID | FK → VEHICLES.id | |
-| start_time | TIMESTAMP | NOT NULL | |
-| end_time | TIMESTAMP | NOT NULL | |
-| status | ENUM | DEFAULT pending | pending / confirmed / active / completed / cancelled / expired |
-| total_amount | DECIMAL(10,2) | NOT NULL | Calculated at creation |
-| created_at | TIMESTAMP | DEFAULT now() | |
-| updated_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | |
+| user_id | Link[User] | Ref | |
+| slot_id | Link[Slot] | Ref | |
+| vehicle_id | Link[Vehicle] | Ref | |
+| start_time | DateTime | Required | |
+| end_time | DateTime | Required | |
+| status | Enum | Default: pending | pending / confirmed / active / completed / cancelled / expired |
+| total_amount | Decimal | Required | Calculated at creation |
+| created_at | DateTime | Default: now() | |
+| updated_at | DateTime | Default: now() | |
 
 **Business rule:** A slot cannot have two ACTIVE bookings at overlapping times.
-**Index:** `(slot_id, status)` — for availability conflict checks
+**Index:** COMPOUND `[("slot_id", 1), ("status", 1)]` — for availability conflict checks
 
 ---
 
 ### PAYMENTS
 One payment record per booking. Created when driver initiates checkout.
 
-| Column | Type | Constraints | Notes |
+| Field | Type | Options | Notes |
 |---|---|---|---|
-| id | UUID | PK | |
-| booking_id | UUID | FK → BOOKINGS.id, UNIQUE | One payment per booking |
-| stripe_payment_id | VARCHAR(255) | | From Stripe API response |
-| amount | DECIMAL(10,2) | NOT NULL | |
-| status | ENUM | DEFAULT pending | pending / paid / failed / refunded |
-| paid_at | TIMESTAMP | NULLABLE | Set when payment completes |
-| created_at | TIMESTAMP | DEFAULT now() | |
+| _id | ObjectId | Auto | |
+| booking_id | Link[Booking] | Unique, Ref | One payment per booking |
+| stripe_payment_id | String | Optional | From Stripe API response |
+| amount | Decimal | Required | |
+| status | Enum | Default: pending | pending / paid / failed / refunded |
+| paid_at | DateTime | Optional | Set when payment completes |
+| created_at | DateTime | Default: now() | |
 
 ---
 
@@ -144,8 +144,8 @@ CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'failed', 'refunded');
 
 ## Key Design Decisions
 
-1. **UUID primary keys** — avoids sequential ID enumeration attacks; safe to expose in URLs.
+1. **ObjectId primary keys** — standard MongoDB convention; fast index lookups.
 2. **Soft deletes via `is_active`** — lots and users are never hard-deleted; historical bookings remain intact.
-3. **Redis mirrors slot status** — `SLOTS.status` is the source of truth; Redis caches it for low-latency availability reads.
+3. **Redis mirrors slot status** — MongoDB Document is the source of truth; Redis caches it for low-latency availability reads.
 4. **`total_amount` stored on booking** — price_per_hour may change; the amount at booking time is preserved.
-5. **UNIQUE on `PAYMENTS.booking_id`** — database-level enforcement of the 1:1 booking → payment rule.
+5. **UNIQUE index on `PAYMENTS.booking_id`** — collection-level enforcement of the 1:1 booking → payment rule.

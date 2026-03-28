@@ -57,7 +57,7 @@ Agile was chosen because:
 | Open/Closed | New notification channels = new Observer class, no existing code changed |
 | Liskov Substitution | Admin can replace User anywhere User is expected |
 | Interface Segregation | IBookable and IPayable are separate — not every entity needs both |
-| Dependency Inversion | Services depend on IRepository, not concrete SQLAlchemy classes |
+| Dependency Inversion | Services depend on IRepository, not concrete Beanie Document classes |
 
 ---
 
@@ -71,8 +71,7 @@ Agile was chosen because:
 - [x] ER diagram
 
 ### Sprint 2 (Days 4–7): Core Backend
-- [ ] SQLAlchemy ORM models
-- [ ] Alembic migrations
+- [ ] Beanie MongoDB Document models
 - [ ] Auth service (register, login, JWT)
 - [ ] Slot service with Redis cache
 - [ ] Booking service (create, cancel)

@@ -1,6 +1,6 @@
 # Parking Lot Management System
  
-A full-stack web application to manage parking lots, slots, bookings, and payments — built with FastAPI, Next.js, and PostgreSQL.
+A full-stack web application to manage parking lots, slots, bookings, and payments — built with FastAPI, Next.js, and MongoDB.
  
 ---
  
@@ -18,11 +18,10 @@ A full-stack web application to manage parking lots, slots, bookings, and paymen
 |---|---|
 | Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
 | Backend | Python, FastAPI |
-| Database | PostgreSQL |
+| Database | MongoDB (Async ODM: Beanie / Motor) |
 | Cache | Redis |
 | Payments | Stripe |
 | Auth | JWT (JSON Web Tokens) |
 | Background jobs | Celery |
-| Migrations | Alembic |
  
 ---

@@ -11,74 +11,74 @@ erDiagram
     BOOKINGS ||--o| PAYMENTS : has
 
     USERS {
-        UUID id PK
-        VARCHAR name
-        VARCHAR email "UNIQUE"
-        VARCHAR phone
-        TEXT password_hash
-        ENUM role "driver, admin"
-        BOOLEAN is_active
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
+        ObjectId _id PK
+        String name
+        String email "UNIQUE"
+        String phone
+        String password_hash
+        Enum role "driver, admin"
+        Boolean is_active
+        DateTime created_at
+        DateTime updated_at
     }
 
     VEHICLES {
-        UUID id PK
-        UUID user_id FK
-        VARCHAR plate_number "UNIQUE"
-        VARCHAR vehicle_type
-        VARCHAR model
-        TIMESTAMP created_at
+        ObjectId _id PK
+        ObjectId user_id Ref
+        String plate_number "UNIQUE"
+        String vehicle_type
+        String model
+        DateTime created_at
     }
 
     PARKING_LOTS {
-        UUID id PK
-        VARCHAR name
-        TEXT address
-        DECIMAL price_per_hour
-        INT total_floors
-        BOOLEAN is_active
-        TIMESTAMP created_at
+        ObjectId _id PK
+        String name
+        String address
+        Decimal price_per_hour
+        Integer total_floors
+        Boolean is_active
+        DateTime created_at
     }
 
     FLOORS {
-        UUID id PK
-        UUID lot_id FK
-        INT floor_number
-        VARCHAR label
-        TIMESTAMP created_at
+        ObjectId _id PK
+        ObjectId lot_id Ref
+        Integer floor_number
+        String label
+        DateTime created_at
     }
 
     SLOTS {
-        UUID id PK
-        UUID floor_id FK
-        VARCHAR slot_code
-        ENUM slot_type
-        ENUM status
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
+        ObjectId _id PK
+        ObjectId floor_id Ref
+        String slot_code
+        Enum slot_type
+        Enum status
+        DateTime created_at
+        DateTime updated_at
     }
 
     BOOKINGS {
-        UUID id PK
-        UUID user_id FK
-        UUID slot_id FK
-        UUID vehicle_id FK
-        TIMESTAMP start_time
-        TIMESTAMP end_time
-        ENUM status
-        DECIMAL total_amount
-        TIMESTAMP created_at
-        TIMESTAMP updated_at
+        ObjectId _id PK
+        ObjectId user_id Ref
+        ObjectId slot_id Ref
+        ObjectId vehicle_id Ref
+        DateTime start_time
+        DateTime end_time
+        Enum status
+        Decimal total_amount
+        DateTime created_at
+        DateTime updated_at
     }
 
     PAYMENTS {
-        UUID id PK
-        UUID booking_id FK "UNIQUE"
-        VARCHAR stripe_payment_id
-        DECIMAL amount
-        ENUM status
-        TIMESTAMP paid_at
-        TIMESTAMP created_at
+        ObjectId _id PK
+        ObjectId booking_id Ref "UNIQUE"
+        String stripe_payment_id
+        Decimal amount
+        Enum status
+        DateTime paid_at
+        DateTime created_at
     }
 ```
