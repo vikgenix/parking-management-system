@@ -8,7 +8,6 @@ It also includes correct UML `<<include>>` and `<<extend>>` relationships to sho
 flowchart LR
     %% Actors
     Driver([👤 Driver])
-    Admin([🛠️ Admin])
 
     %% System Boundary
     subgraph "Parking Management System Core Functions"
@@ -45,7 +44,13 @@ flowchart LR
     Driver --- UC4
     Driver --- UC6
 
-    %% Admin Links (Flipped syntax to force Admin to render on the RIGHT side)
+    %% Admin Actor & Links (Declared here so Mermaid explicitly ranks it on the RIGHT)
+    Admin([🛠️ Admin])
+    
+    %% Force Admin to strictly render to the right of the furthest Use Cases using invisible structural links
+    UC5 ~~~ Admin
+    UC6 ~~~ Admin
+
     UC8 --- Admin
     UC9 --- Admin
     UC3 --- Admin
