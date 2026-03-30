@@ -3,6 +3,7 @@
 ## Model: Agile (Iterative Sprints)
 
 Agile was chosen because:
+
 - Requirements may evolve (e.g. adding EV charging slots, monthly passes)
 - Early working software is more valuable than complete documentation
 - The system can be demo-ed to stakeholders sprint by sprint
@@ -14,10 +15,12 @@ Agile was chosen because:
 **Goal:** Define scope, actors, and core features.
 
 **Actors:**
+
 - Driver — books and pays for parking
 - Admin — manages lots, floors, slots, views reports, and checks vehicles in and out at the gate
 
 **Core Features (MVP):**
+
 - User registration and login (JWT auth)
 - Browse parking lots and available slots
 - Book a slot with start/end time
@@ -26,6 +29,7 @@ Agile was chosen because:
 - Admin dashboard for lot and slot management
 
 **Out of scope for MVP:**
+
 - Mobile app
 - Monthly subscription passes
 - License plate recognition
@@ -38,6 +42,7 @@ Agile was chosen because:
 **Architecture:** 3-tier (Client → API → Database)
 
 **Design Patterns selected:**
+
 1. Observer Pattern — booking lifecycle events (notifications, slot updates, audit logs)
 2. Repository Pattern — decouples services from database queries
 3. Strategy Pattern (planned) — payment strategies (Stripe, cash, UPI)
@@ -64,6 +69,7 @@ Agile was chosen because:
 ## Phase 3 — Implementation Sprints
 
 ### Sprint 1 (Days 1–3): Foundation
+
 - [x] Folder structure
 - [x] Base models and class hierarchy
 - [x] Observer pattern implementation
@@ -71,18 +77,21 @@ Agile was chosen because:
 - [x] ER diagram
 
 ### Sprint 2 (Days 4–7): Core Backend
+
 - [ ] Beanie MongoDB Document models
 - [ ] Auth service (register, login, JWT)
 - [ ] Slot service with Redis cache
 - [ ] Booking service (create, cancel)
 
 ### Sprint 3 (Days 8–11): Payments + Frontend Shell
+
 - [ ] Stripe payment integration
 - [ ] Celery task: auto-expire unpaid bookings
 - [ ] Next.js login and register pages
 - [ ] Driver slot grid and booking form
 
 ### Sprint 4 (Days 12–14): Admin + Polish
+
 - [ ] Admin dashboard (lots, slots, reports)
 - [ ] Unit tests for BookingService
 - [ ] Error handling and input validation
@@ -97,6 +106,7 @@ Agile was chosen because:
 **Manual testing:** Swagger UI for all endpoints
 
 **Test strategy:**
+
 - In-memory repositories used in unit tests (no DB dependency)
 - pytest + pytest-asyncio for async FastAPI routes
 
@@ -112,9 +122,9 @@ Agile was chosen because:
 
 ## Progress Tracking
 
-| Milestone | Target Date | Status |
-|---|---|---|
-| Repo setup + base classes | Day 1 | Done |
-| Core backend (auth + booking) | Day 7 | In progress |
-| 40% core functionality | 10 April | Target |
-| Full MVP | End of April | Planned |
+| Milestone                     | Target Date  | Status      |
+| ----------------------------- | ------------ | ----------- |
+| Repo setup + base classes     | Day 1        | Done        |
+| Core backend (auth + booking) | Day 7        | In progress |
+| 40% core functionality        | 10 April     | Target      |
+| Full MVP                      | End of April | Planned     |

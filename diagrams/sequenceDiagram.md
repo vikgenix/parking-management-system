@@ -5,7 +5,7 @@ This sequence diagram illustrates the step-by-step process of the most critical 
 ```mermaid
 sequenceDiagram
     autonumber
-    
+
     %% Participants
     actor Driver
     participant Frontend as Web App
@@ -41,7 +41,7 @@ sequenceDiagram
     note right of Driver: 3. Payment Processing
     Driver->>Frontend: Enters card details & Submits
     Frontend->>Stripe: Process Payment directly
-    
+
     alt Payment Successful
         Stripe-->>Frontend: Success (Stripe Payment ID)
         Frontend->>Backend: POST /api/payments (Confirm)
@@ -66,7 +66,7 @@ sequenceDiagram
     Backend->>DB: Fetch booking by ID
     DB-->>Backend: Booking verified (status="confirmed")
     Backend-->>Frontend: Valid Booking Data
-    
+
     Admin->>Frontend: Clicks "Check-in Vehicle"
     Frontend->>Backend: PUT /api/bookings/{id}/checkin
     Backend->>DB: Update BOOKING status to "active"

@@ -1,0 +1,30 @@
+{
+  "name": "parking-management",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "start": "turbo run start",
+    "clean": "turbo run clean && rm -rf .turbo/",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md,yaml,yml}\"",
+    "deps:check": "syncpack lint",
+    "deps:fix": "syncpack fix"
+  },
+  "devDependencies": {
+    "prettier": "^3.8.1",
+    "syncpack": "^14.2.1",
+    "turbo": "^2.8.21"
+  },
+  "packageManager": "bun@1.0.0",
+  "engines": {
+    "bun": ">=1.0.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}

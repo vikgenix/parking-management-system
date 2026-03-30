@@ -5,6 +5,7 @@
 Hiding complex implementation behind simple interfaces.
 
 **Where used:**
+
 - `BaseEntity` — abstract class forcing every model to implement `to_dict()`
 - `IBookable` — abstract interface with `is_available()`, `reserve()`, `release()`
 - `IPayable` — abstract interface with `calculate_amount()`, `mark_paid()`
@@ -27,6 +28,7 @@ class IBookable(ABC):
 Bundling data and methods together; restricting direct access to internal state.
 
 **Where used:**
+
 - `User._password_hash` — double underscore makes it truly private in Python
 - `ParkingSlot.status` — can only change via `reserve()`, `release()`, `occupy()`
 - `BaseEntity._id` — exposed only via read-only `@property`
@@ -76,6 +78,7 @@ Different classes respond to the same method call in different ways.
 **Where used:**
 
 **a) Method overriding — notify():**
+
 ```python
 user    = User(...)
 admin   = Admin(...)
@@ -87,6 +90,7 @@ admin.notify("msg")   # sends email + sms + dashboard
 ```
 
 **b) Duck typing via interfaces:**
+
 ```python
 # BookingEventPublisher doesn't care which observer it calls
 for observer in self._observers:
@@ -94,6 +98,7 @@ for observer in self._observers:
 ```
 
 **c) IBookable polymorphism:**
+
 ```python
 def process_booking(bookable: IBookable):
     if bookable.is_available():
@@ -116,22 +121,22 @@ class ParkingSlot(BaseEntity, IBookable):
 
 ## 6. Abstract Classes vs Interfaces
 
-| | Abstract Class | Interface (ABC with all abstract methods) |
-|---|---|---|
-| Example | `BaseEntity` | `IBookable`, `IPayable`, `IRepository` |
-| Can have implementation | Yes — `touch()`, `__repr__()` | No — all methods abstract |
-| Purpose | Shared base behaviour | Contract / capability |
+|                         | Abstract Class                | Interface (ABC with all abstract methods) |
+| ----------------------- | ----------------------------- | ----------------------------------------- |
+| Example                 | `BaseEntity`                  | `IBookable`, `IPayable`, `IRepository`    |
+| Can have implementation | Yes — `touch()`, `__repr__()` | No — all methods abstract                 |
+| Purpose                 | Shared base behaviour         | Contract / capability                     |
 
 ---
 
 ## Summary Table
 
-| OOP Concept | Class / File | Line(s) |
-|---|---|---|
-| Abstraction | `BaseEntity`, `IBookable`, `IPayable` | `src/models/base.py` |
-| Encapsulation | `User.__password_hash`, `ParkingSlot.status` | `src/models/base.py` |
-| Inheritance | `Driver` and `Admin` extend `User` | `src/models/base.py` |
-| Polymorphism | `notify()` override, Observer `handle()` | `src/models/base.py`, `src/core/observer_pattern.py` |
-| Multiple Inheritance | `ParkingSlot(BaseEntity, IBookable)` | `src/models/base.py` |
-| Design Pattern | Observer Pattern | `src/core/observer_pattern.py` |
-| Repository Pattern | `IRepository`, `InMemoryUserRepository` | `src/repositories/interfaces.py` |
+| OOP Concept          | Class / File                                 | Line(s)                                              |
+| -------------------- | -------------------------------------------- | ---------------------------------------------------- |
+| Abstraction          | `BaseEntity`, `IBookable`, `IPayable`        | `src/models/base.py`                                 |
+| Encapsulation        | `User.__password_hash`, `ParkingSlot.status` | `src/models/base.py`                                 |
+| Inheritance          | `Driver` and `Admin` extend `User`           | `src/models/base.py`                                 |
+| Polymorphism         | `notify()` override, Observer `handle()`     | `src/models/base.py`, `src/core/observer_pattern.py` |
+| Multiple Inheritance | `ParkingSlot(BaseEntity, IBookable)`         | `src/models/base.py`                                 |
+| Design Pattern       | Observer Pattern                             | `src/core/observer_pattern.py`                       |
+| Repository Pattern   | `IRepository`, `InMemoryUserRepository`      | `src/repositories/interfaces.py`                     |
