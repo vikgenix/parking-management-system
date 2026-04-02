@@ -25,12 +25,34 @@
       "cache": false
     },
     "lint": {
+      "with": ["check-types"],
       "cache": false
     },
     "lint:fix": {
       "cache": false
     },
+    "check-types": {
+      "cache": false
+    },
+    "healthcheck": {
+      "persistent": true,
+      "cache": false
+    },
     "format": {
+      "cache": false
+    },
+    "db:generate": {
+      "env": ["DATABASE_URL"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["src/generated/**"]
+    },
+    "db:migrate:dev": {
+      "cache": false
+    },
+    "db:migrate:deploy": {
+      "cache": false
+    },
+    "db:seed": {
       "cache": false
     }
   }

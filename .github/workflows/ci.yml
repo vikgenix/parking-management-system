@@ -12,6 +12,8 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://prisma:prisma@localhost:5432/temp"
     steps:
       - name: Checkout code
         uses: actions/checkout@v6

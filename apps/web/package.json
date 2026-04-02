@@ -11,6 +11,7 @@
     "clean": "rm -rf dist .vite",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
+    "check-types": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "dependencies": {
@@ -37,7 +38,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.1.4",
-    "eslint": "^9.39.4",
+    "eslint": "^10.1.0",
     "jsdom": "^28.1.0",
     "prettier": "^3.8.1",
     "typescript": "^5.7.2",

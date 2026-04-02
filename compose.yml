@@ -1,0 +1,30 @@
+x-db-env: &db-env
+  DATABASE_URL: ${DATABASE_URL:-postgres://postgres:postgres@db:5432/parking-management}
+
+services:
+  db:
+    profiles: ["localdb"]
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: parking-management
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+    networks:
+      - parking-management
+
+volumes:
+  postgres_data: null
+networks:
+  parking-management:
+    driver: bridge
+    name: parking-management

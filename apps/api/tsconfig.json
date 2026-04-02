@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "@parking-management/typescript-config/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "outDir": "dist"
+  },
+  "include": ["src", "prisma"],
+  "exclude": ["node_modules", "dist", "**/__tests__"],
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "replaceExtensions": {
+      ".ts": ".js"
+    }
+  }
+}
