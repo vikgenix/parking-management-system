@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Users, CarFront, Banknote, MapPin, ArrowUpRight, Clock, CheckCircle2 } from "lucide-react";
+import { CarFront, Banknote, MapPin, ArrowUpRight, CheckCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
