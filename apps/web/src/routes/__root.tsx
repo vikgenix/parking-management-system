@@ -1,8 +1,8 @@
 import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { TanStackDevtools } from "@tanstack/react-devtools";
-import Footer from "../components/Footer";
 import Header from "../components/Header";
+import Sidebar from "../components/Sidebar";
 
 import appCss from "../styles.css?url";
 
@@ -11,23 +11,11 @@ const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getIte
 export const Route = createRootRoute({
   head: () => ({
     meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        title: "TanStack Start Starter",
-      },
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { title: "Parking Management Dashboard" },
     ],
-    links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootDocument,
 });
@@ -39,20 +27,22 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <Header />
-        {children}
-        <Footer />
+      <body className="font-sans antialiased text-[var(--sea-ink)] bg-[var(--bg-base)]">
+        <div className="flex min-h-screen">
+          <Sidebar />
+          
+          <div className="flex-1 flex flex-col min-w-0 min-h-screen">
+            <Header />
+            <main className="flex-1 overflow-x-hidden overflow-y-auto">
+              {children}
+            </main>
+          </div>
+        </div>
+
+        {/* Development Tooling */}
         <TanStackDevtools
-          config={{
-            position: "bottom-right",
-          }}
-          plugins={[
-            {
-              name: "Tanstack Router",
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
+          config={{ position: "bottom-right" }}
+          plugins={[{ name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> }]}
         />
         <Scripts />
       </body>

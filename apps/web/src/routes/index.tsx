@@ -1,87 +1,118 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Users, CarFront, Banknote, MapPin, ArrowUpRight, Clock, CheckCircle2 } from "lucide-react";
 
-export const Route = createFileRoute("/")({ component: App });
+export const Route = createFileRoute("/")({ component: Dashboard });
 
-function App() {
+function Dashboard() {
   return (
-    <main className="page-wrap px-4 pb-8 pt-14">
-      <section className="island-shell rise-in relative overflow-hidden rounded-[2rem] px-6 py-10 sm:px-10 sm:py-14">
-        <div className="pointer-events-none absolute -left-20 -top-24 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(79,184,178,0.32),transparent_66%)]" />
-        <div className="pointer-events-none absolute -bottom-20 -right-20 h-56 w-56 rounded-full bg-[radial-gradient(circle,rgba(47,106,74,0.18),transparent_66%)]" />
-        <p className="island-kicker mb-3">TanStack Start Base Template</p>
-        <h1 className="display-title mb-5 max-w-3xl text-4xl leading-[1.02] font-bold tracking-tight text-[var(--sea-ink)] sm:text-6xl">
-          Start simple, ship quickly.
-        </h1>
-        <p className="mb-8 max-w-2xl text-base text-[var(--sea-ink-soft)] sm:text-lg">
-          This base starter intentionally keeps things light: two routes, clean
-          structure, and the essentials you need to build from scratch.
-        </p>
-        <div className="flex flex-wrap gap-3">
-          <a
-            href="/about"
-            className="rounded-full border border-[rgba(50,143,151,0.3)] bg-[rgba(79,184,178,0.14)] px-5 py-2.5 text-sm font-semibold text-[var(--lagoon-deep)] no-underline transition hover:-translate-y-0.5 hover:bg-[rgba(79,184,178,0.24)]"
-          >
-            About This Starter
-          </a>
-          <a
-            href="https://tanstack.com/router"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full border border-[rgba(23,58,64,0.2)] bg-white/50 px-5 py-2.5 text-sm font-semibold text-[var(--sea-ink)] no-underline transition hover:-translate-y-0.5 hover:border-[rgba(23,58,64,0.35)]"
-          >
-            Router Guide
-          </a>
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+      
+      {/* Welcome Section */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--sea-ink)] mb-1">Overview Dashboard</h1>
+          <p className="text-[var(--sea-ink-soft)]">Here is what's happening at your parking facilities today.</p>
         </div>
-      </section>
+        <div className="flex gap-3">
+          <button className="px-4 py-2 bg-[var(--surface)] border border-[var(--line)] text-[var(--sea-ink)] font-medium rounded-xl shadow-sm hover:border-indigo-500/30 transition-all">Download Report</button>
+          <button className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.39)] hover:bg-indigo-500 hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] transition-all">New Booking</button>
+        </div>
+      </div>
 
-      <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          [
-            "Type-Safe Routing",
-            "Routes and links stay in sync across every page.",
-          ],
-          [
-            "Server Functions",
-            "Call server code from your UI without creating API boilerplate.",
-          ],
-          [
-            "Streaming by Default",
-            "Ship progressively rendered responses for faster experiences.",
-          ],
-          [
-            "Tailwind Native",
-            "Design quickly with utility-first styling and reusable tokens.",
-          ],
-        ].map(([title, desc], index) => (
-          <article
-            key={title}
-            className="island-shell feature-card rise-in rounded-2xl p-5"
-            style={{ animationDelay: `${index * 90 + 80}ms` }}
-          >
-            <h2 className="mb-2 text-base font-semibold text-[var(--sea-ink)]">
-              {title}
-            </h2>
-            <p className="m-0 text-sm text-[var(--sea-ink-soft)]">{desc}</p>
-          </article>
-        ))}
-      </section>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <MetricCard title="Total Revenue (Today)" value="$4,250.00" trend="+12.5%" icon={<Banknote />} color="text-emerald-500" />
+        <MetricCard title="Active Bookings" value="142" trend="+8.2%" icon={<CheckCircle2 />} color="text-indigo-500" />
+        <MetricCard title="Vehicles Parked" value="128" trend="+3.1%" icon={<CarFront />} color="text-blue-500" />
+        <MetricCard title="Available Slots" value="45" trend="-12.4%" trendDown icon={<MapPin />} color="text-cyan-500" />
+      </div>
 
-      <section className="island-shell mt-8 rounded-2xl p-6">
-        <p className="island-kicker mb-2">Quick Start</p>
-        <ul className="m-0 list-disc space-y-2 pl-5 text-sm text-[var(--sea-ink-soft)]">
-          <li>
-            Edit <code>src/routes/index.tsx</code> to customize the home page.
-          </li>
-          <li>
-            Update <code>src/components/Header.tsx</code> and{" "}
-            <code>src/components/Footer.tsx</code> for brand links.
-          </li>
-          <li>
-            Add routes in <code>src/routes</code> and tweak visual tokens in{" "}
-            <code>src/styles.css</code>.
-          </li>
-        </ul>
-      </section>
-    </main>
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        {/* Recent Activity Table (Spans 2 columns) */}
+        <div className="lg:col-span-2 dashboard-card p-6 min-h-[400px]">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-bold text-[var(--sea-ink)]">Recent Arrivals & Departures</h2>
+            <button className="text-sm font-medium text-indigo-500 hover:text-indigo-400 flex items-center gap-1">View All <ArrowUpRight size={16}/></button>
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-sm text-[var(--sea-ink-soft)]">
+              <thead className="border-b border-[var(--line)] uppercase text-xs font-semibold tracking-wider pb-3 block w-full mb-3">
+                <tr className="w-full flex justify-between pr-4">
+                  <th className="w-1/4 font-semibold">User</th>
+                  <th className="w-1/4 font-semibold">Vehicle</th>
+                  <th className="w-1/4 font-semibold">Slot</th>
+                  <th className="w-1/4 font-semibold text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody className="flex flex-col gap-2">
+                <TableRow user="Alex Johnson" plate="XYZ-987" slot="F1-A12" status="Active" time="10 mins ago" />
+                <TableRow user="Maria Garcia" plate="ABC-123" slot="F2-B05" status="Completed" time="45 mins ago" />
+                <TableRow user="James Smith" plate="DEF-456" slot="F1-A01" status="Pending" time="1 hour ago" />
+                <TableRow user="Sarah Williams" plate="GHJ-789" slot="F3-C22" status="Active" time="2 hours ago" />
+                <TableRow user="Michael Brown" plate="JKL-012" slot="F2-B11" status="Completed" time="3 hours ago" />
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Action Panel Sidebar */}
+        <div className="dashboard-card p-6 flex flex-col">
+          <h2 className="text-lg font-bold text-[var(--sea-ink)] mb-6">Facility Status</h2>
+          <div className="flex-1 flex flex-col justify-center items-center text-center space-y-4">
+            <div className="relative">
+              <svg className="w-40 h-40 transform -rotate-90">
+                <circle cx="80" cy="80" r="70" stroke="var(--line)" strokeWidth="12" fill="none" />
+                <circle cx="80" cy="80" r="70" stroke="#4f46e5" strokeWidth="12" fill="none" strokeDasharray="440" strokeDashoffset="110" className="transition-all duration-1000 ease-out" />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-3xl font-bold text-[var(--sea-ink)]">75%</span>
+                <span className="text-xs font-medium text-[var(--sea-ink-soft)] uppercase tracking-wide">Capacity</span>
+              </div>
+            </div>
+            <p className="text-sm text-[var(--sea-ink-soft)] mt-4">Peak hours approaching. Floor 1 is currently operating at 95% capacity.</p>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  );
+}
+
+// Helper Components for clean Mockups
+function MetricCard({ title, value, trend, icon, color, trendDown = false }: any) {
+  return (
+    <div className="dashboard-card p-5 flex flex-col gap-4">
+      <div className="flex items-start justify-between">
+        <div className="space-y-1">
+          <p className="text-sm font-medium text-[var(--sea-ink-soft)]">{title}</p>
+          <p className="text-2xl font-bold text-[var(--sea-ink)]">{value}</p>
+        </div>
+        <div className={`p-3 rounded-2xl bg-[var(--link-bg-hover)] ${color}`}>{icon}</div>
+      </div>
+      <div className="flex items-center gap-2 text-sm">
+        <span className={`font-medium px-2 py-0.5 rounded-md ${trendDown ? 'bg-red-500/10 text-red-500' : 'bg-emerald-500/10 text-emerald-500'}`}>{trend}</span>
+        <span className="text-[var(--sea-ink-soft)]">vs last weak</span>
+      </div>
+    </div>
+  );
+}
+
+function TableRow({ user, plate, slot, status, time }: any) {
+  return (
+    <tr className="w-full flex justify-between items-center bg-[var(--link-bg-hover)] p-3 rounded-xl hover:bg-[var(--line)] transition-colors border border-transparent">
+      <td className="w-1/4 font-medium text-[var(--sea-ink)] flex items-center gap-2">
+        <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-cyan-500 flex-shrink-0" />
+        <span className="truncate">{user}</span>
+      </td>
+      <td className="w-1/4 text-[var(--sea-ink-soft)] font-mono text-sm">{plate}</td>
+      <td className="w-1/4 font-medium text-[var(--sea-ink)]"><span className="bg-[var(--surface-strong)] px-2 py-1 rounded-md border border-[var(--line)]">{slot}</span></td>
+      <td className="w-1/4 text-right flex flex-col items-end">
+        <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${status === 'Active' ? 'bg-emerald-500/10 text-emerald-500' : status === 'Completed' ? 'bg-indigo-500/10 text-indigo-500' : 'bg-amber-500/10 text-amber-500'}`}>{status}</span>
+        <span className="text-xs text-[var(--sea-ink-soft)] mt-1">{time}</span>
+      </td>
+    </tr>
   );
 }
