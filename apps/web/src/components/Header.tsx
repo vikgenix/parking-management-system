@@ -1,5 +1,5 @@
+import { Bell, Search, User } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
-import { User, Bell, Search } from "lucide-react";
 
 export default function Header() {
   return (

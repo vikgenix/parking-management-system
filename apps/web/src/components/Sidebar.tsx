@@ -1,5 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { LayoutDashboard, Car, CalendarCheck, CreditCard, Settings, LogOut, Map } from "lucide-react";
+import {
+  CalendarCheck,
+  Car,
+  CreditCard,
+  LayoutDashboard,
+  LogOut,
+  Map,
+  Settings,
+} from "lucide-react";
 
 export default function Sidebar() {
   return (

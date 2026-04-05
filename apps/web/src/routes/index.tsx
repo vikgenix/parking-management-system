@@ -1,5 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CarFront, Banknote, MapPin, ArrowUpRight, CheckCircle2 } from "lucide-react";
+import {
+  ArrowUpRight,
+  Banknote,
+  CarFront,
+  CheckCircle2,
+  MapPin,
+} from "lucide-react";
 
 export const Route = createFileRoute("/")({ component: Dashboard });
 
@@ -72,7 +78,10 @@ function Dashboard() {
                 <span className="text-xs font-medium text-[var(--sea-ink-soft)] uppercase tracking-wide">Capacity</span>
               </div>
             </div>
-            <p className="text-sm text-[var(--sea-ink-soft)] mt-4">Peak hours approaching. Floor 1 is currently operating at 95% capacity.</p>
+            <p className="text-sm text-[var(--sea-ink-soft)] mt-4">
+              Peak hours approaching. Floor 1 is currently operating at 95%
+              capacity.
+            </p>
           </div>
         </div>
         
