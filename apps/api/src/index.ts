@@ -1,10 +1,19 @@
 import App from "@/app";
-import { verifyDBConnection } from "@/shared/lib/db";
-import routes from "@/routes";
+import env from "@/constants/env";
+import { verifyDBConnection } from "@/lib/prisma";
+import router from "@/modules";
 
 async function main() {
   await verifyDBConnection();
-  const app = new App(routes);
+  const app = new App(
+    [
+      {
+        path: "/",
+        router,
+      },
+    ],
+    env,
+  );
   app.startServer();
 }
 

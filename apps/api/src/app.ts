@@ -1,18 +1,22 @@
-import express from "express";
-import cors from "cors";
 import cookieParser from "cookie-parser";
-import env from "@/shared/constants/env";
-import errorHandler from "./shared/middleware/errorHandler";
+import cors from "cors";
+import express from "express";
 
-export interface Route {
+import { EnvService } from "@/constants/env";
+import errorHandler from "@/middleware/errorHandler";
+
+export type Route = {
   path: string;
   router: express.Router;
-}
+};
 
 class App {
   private app: express.Application;
+  private config: EnvService;
 
-  constructor(routes: Route[]) {
+  constructor(routes: Route[], config: EnvService) {
+    this.config = config;
+
     this.app = express();
     this.setupMiddleware();
     this.setupRoutes(routes);
@@ -22,7 +26,7 @@ class App {
   private setupMiddleware() {
     this.app.use(
       cors({
-        origin: env.get("APP_ORIGIN"),
+        origin: this.config.get("APP_ORIGIN"),
         credentials: true,
       }),
     );
@@ -40,9 +44,9 @@ class App {
   }
 
   public startServer() {
-    const port = env.get("PORT");
+    const port = this.config.get("PORT");
     this.app.listen(port, () => {
-      console.info(`Server is running on port ${port}`);
+      console.info(`Server is running on http://localhost:${port}`);
     });
   }
 }

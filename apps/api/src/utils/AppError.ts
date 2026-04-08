@@ -1,4 +1,4 @@
-import HttpStatusCode from "@/shared/constants/httpStatusCodes";
+import HttpStatusCode from "@/constants/httpStatusCodes";
 
 export const enum AppErrorCode {
   InvalidAccessToken = "InvalidAccessToken",

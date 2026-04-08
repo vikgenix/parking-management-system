@@ -1,6 +1,6 @@
 import { CookieOptions, Response } from "express";
-import { thirtyDays, thirtyDaysFromNow } from "@/shared/constants/dates";
-import env from "@/shared/constants/env";
+import { thirtyDays, thirtyDaysFromNow } from "@/constants/dates";
+import env from "@/constants/env";
 
 const secure = env.get("NODE_ENV") === "production";
 const sameSite = env.get("NODE_ENV") === "production" ? "none" : "lax";

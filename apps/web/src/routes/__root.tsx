@@ -30,7 +30,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body className="font-sans antialiased text-[var(--sea-ink)] bg-[var(--bg-base)]">
         <div className="flex min-h-screen">
           <Sidebar />
-          
+
           <div className="flex-1 flex flex-col min-w-0 min-h-screen">
             <Header />
             <main className="flex-1 overflow-x-hidden overflow-y-auto">
@@ -42,7 +42,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         {/* Development Tooling */}
         <TanStackDevtools
           config={{ position: "bottom-right" }}
-          plugins={[{ name: "Tanstack Router", render: <TanStackRouterDevtoolsPanel /> }]}
+          plugins={[
+            {
+              name: "Tanstack Router",
+              render: <TanStackRouterDevtoolsPanel />,
+            },
+          ]}
         />
         <Scripts />
       </body>
