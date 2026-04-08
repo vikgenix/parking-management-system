@@ -4,7 +4,7 @@ A full-stack monorepo application to manage parking lots, slots, bookings, and p
 
 ---
 
-## What it does
+## What it does -
 
 - Drivers can view available slots, book a spot, and pay online
 - Admins can manage parking lots, floors, slot availability, and check vehicles in and out
@@ -12,7 +12,7 @@ A full-stack monorepo application to manage parking lots, slots, bookings, and p
 
 ---
 
-## Project Structure
+## Project Structure -
 
 This project is structured as a monorepo using **Turborepo** and **Bun**:
 
