@@ -10,6 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VehiclesRouteImport } from './routes/vehicles'
+import { Route as UsersRouteImport } from './routes/users'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as ParkingManagementRouteImport } from './routes/parking-management'
+import { Route as MyBookingsRouteImport } from './routes/my-bookings'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as BookingsRouteImport } from './routes/bookings'
+import { Route as BookSlotRouteImport } from './routes/book-slot'
 import { Route as AdminToolsRouteImport } from './routes/admin-tools'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -17,6 +25,46 @@ import { Route as IndexRouteImport } from './routes/index'
 const VehiclesRoute = VehiclesRouteImport.update({
   id: '/vehicles',
   path: '/vehicles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentsRoute = PaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ParkingManagementRoute = ParkingManagementRouteImport.update({
+  id: '/parking-management',
+  path: '/parking-management',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyBookingsRoute = MyBookingsRouteImport.update({
+  id: '/my-bookings',
+  path: '/my-bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookingsRoute = BookingsRouteImport.update({
+  id: '/bookings',
+  path: '/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookSlotRoute = BookSlotRouteImport.update({
+  id: '/book-slot',
+  path: '/book-slot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminToolsRoute = AdminToolsRouteImport.update({
@@ -39,12 +87,28 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin-tools': typeof AdminToolsRoute
+  '/book-slot': typeof BookSlotRoute
+  '/bookings': typeof BookingsRoute
+  '/login': typeof LoginRoute
+  '/my-bookings': typeof MyBookingsRoute
+  '/parking-management': typeof ParkingManagementRoute
+  '/payments': typeof PaymentsRoute
+  '/signup': typeof SignupRoute
+  '/users': typeof UsersRoute
   '/vehicles': typeof VehiclesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin-tools': typeof AdminToolsRoute
+  '/book-slot': typeof BookSlotRoute
+  '/bookings': typeof BookingsRoute
+  '/login': typeof LoginRoute
+  '/my-bookings': typeof MyBookingsRoute
+  '/parking-management': typeof ParkingManagementRoute
+  '/payments': typeof PaymentsRoute
+  '/signup': typeof SignupRoute
+  '/users': typeof UsersRoute
   '/vehicles': typeof VehiclesRoute
 }
 export interface FileRoutesById {
@@ -52,20 +116,73 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/admin-tools': typeof AdminToolsRoute
+  '/book-slot': typeof BookSlotRoute
+  '/bookings': typeof BookingsRoute
+  '/login': typeof LoginRoute
+  '/my-bookings': typeof MyBookingsRoute
+  '/parking-management': typeof ParkingManagementRoute
+  '/payments': typeof PaymentsRoute
+  '/signup': typeof SignupRoute
+  '/users': typeof UsersRoute
   '/vehicles': typeof VehiclesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/admin-tools' | '/vehicles'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/admin-tools'
+    | '/book-slot'
+    | '/bookings'
+    | '/login'
+    | '/my-bookings'
+    | '/parking-management'
+    | '/payments'
+    | '/signup'
+    | '/users'
+    | '/vehicles'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/admin-tools' | '/vehicles'
-  id: '__root__' | '/' | '/about' | '/admin-tools' | '/vehicles'
+  to:
+    | '/'
+    | '/about'
+    | '/admin-tools'
+    | '/book-slot'
+    | '/bookings'
+    | '/login'
+    | '/my-bookings'
+    | '/parking-management'
+    | '/payments'
+    | '/signup'
+    | '/users'
+    | '/vehicles'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/admin-tools'
+    | '/book-slot'
+    | '/bookings'
+    | '/login'
+    | '/my-bookings'
+    | '/parking-management'
+    | '/payments'
+    | '/signup'
+    | '/users'
+    | '/vehicles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   AdminToolsRoute: typeof AdminToolsRoute
+  BookSlotRoute: typeof BookSlotRoute
+  BookingsRoute: typeof BookingsRoute
+  LoginRoute: typeof LoginRoute
+  MyBookingsRoute: typeof MyBookingsRoute
+  ParkingManagementRoute: typeof ParkingManagementRoute
+  PaymentsRoute: typeof PaymentsRoute
+  SignupRoute: typeof SignupRoute
+  UsersRoute: typeof UsersRoute
   VehiclesRoute: typeof VehiclesRoute
 }
 
@@ -76,6 +193,62 @@ declare module '@tanstack/react-router' {
       path: '/vehicles'
       fullPath: '/vehicles'
       preLoaderRoute: typeof VehiclesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payments': {
+      id: '/payments'
+      path: '/payments'
+      fullPath: '/payments'
+      preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parking-management': {
+      id: '/parking-management'
+      path: '/parking-management'
+      fullPath: '/parking-management'
+      preLoaderRoute: typeof ParkingManagementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-bookings': {
+      id: '/my-bookings'
+      path: '/my-bookings'
+      fullPath: '/my-bookings'
+      preLoaderRoute: typeof MyBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bookings': {
+      id: '/bookings'
+      path: '/bookings'
+      fullPath: '/bookings'
+      preLoaderRoute: typeof BookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/book-slot': {
+      id: '/book-slot'
+      path: '/book-slot'
+      fullPath: '/book-slot'
+      preLoaderRoute: typeof BookSlotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin-tools': {
@@ -106,6 +279,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   AdminToolsRoute: AdminToolsRoute,
+  BookSlotRoute: BookSlotRoute,
+  BookingsRoute: BookingsRoute,
+  LoginRoute: LoginRoute,
+  MyBookingsRoute: MyBookingsRoute,
+  ParkingManagementRoute: ParkingManagementRoute,
+  PaymentsRoute: PaymentsRoute,
+  SignupRoute: SignupRoute,
+  UsersRoute: UsersRoute,
   VehiclesRoute: VehiclesRoute,
 }
 export const routeTree = rootRouteImport

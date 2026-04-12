@@ -1,7 +1,18 @@
+
 import { Bell, Search, User } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import ThemeToggle from "./ThemeToggle";
+import { getUser, logout } from "../lib/auth";
 
 export default function Header() {
+  const navigate = useNavigate();
+  const user = getUser();
+
+  const handleSignOut = () => {
+    logout();
+    navigate({ to: "/login" });
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-[var(--line)] bg-[var(--header-bg)] backdrop-blur-xl transition-all">
       <div className="flex h-16 items-center justify-between px-6 lg:px-8">
@@ -35,8 +46,14 @@ export default function Header() {
 
           <div className="h-8 w-px bg-[var(--line)] mx-1 hidden sm:block"></div>
 
-          <button className="flex items-center gap-2 rounded-full p-1 pl-3 pr-1 text-sm font-medium text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)] transition-colors border border-transparent hover:border-[var(--line)]">
-            <span className="hidden sm:block">Admin User</span>
+          <button
+            onClick={handleSignOut}
+            title="Sign out"
+            className="flex items-center gap-2 rounded-full p-1 pl-3 pr-1 text-sm font-medium text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)] transition-colors border border-transparent hover:border-[var(--line)]"
+          >
+            <span className="hidden sm:block">
+              {user?.name ?? "Admin User"}
+            </span>
             <div className="h-8 w-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white">
               <User size={16} />
             </div>

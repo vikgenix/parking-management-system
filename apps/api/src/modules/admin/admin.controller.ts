@@ -14,8 +14,18 @@ class AdminController {
 
   public getUsers: RequestHandler = async (_req, res) => {
     const users = await this.adminServce.handleGetUsers();
-
     res.json({ users });
+  };
+
+  public getDashboardStats: RequestHandler = async (_req, res) => {
+    const stats = await this.adminServce.handleGetDashboardStats();
+    res.json({ stats });
+  };
+
+  public getRecentBookings: RequestHandler = async (req, res) => {
+    const limit = Number(req.query["limit"]) || 10;
+    const bookings = await this.adminServce.handleGetRecentBookings(limit);
+    res.json({ bookings });
   };
 
   public createFloor: RequestHandler = async (req, res) => {

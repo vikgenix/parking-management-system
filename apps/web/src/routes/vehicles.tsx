@@ -1,6 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Car, Plus, Trash2 } from "lucide-react";
+import { Car, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { vehicleApi } from "../lib/api";
 import type { Vehicle } from "../lib/api";
 
@@ -13,15 +13,17 @@ function VehiclesComponent() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
-  const [licencePlate, setLicencePlate] = React.useState("");
+  const [licensePlate, setLicensePlate] = React.useState("");
   const [model, setModel] = React.useState("");
   const [registering, setRegistering] = React.useState(false);
+  const [registerError, setRegisterError] = React.useState<string | null>(null);
+  const [registerSuccess, setRegisterSuccess] = React.useState<string | null>(null);
 
   const fetchVehicles = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await vehicleApi.getVehicles();
+      const { vehicles: data } = await vehicleApi.getVehicles();
       setVehicles(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || "Failed to load vehicles");
@@ -36,159 +38,220 @@ function VehiclesComponent() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!licencePlate.trim()) return;
+    if (!licensePlate.trim()) return;
+    setRegisterError(null);
+    setRegisterSuccess(null);
 
     try {
       setRegistering(true);
-      await vehicleApi.registerVehicle({ licencePlate, model });
-      setLicencePlate("");
+      const res = await vehicleApi.registerVehicle({
+        licencePlate: licensePlate.trim(),
+        model: model.trim() || undefined,
+      });
+      setRegisterSuccess(
+        `Vehicle "${res.vehicle?.licensePlate ?? licensePlate}" registered successfully`,
+      );
+      setLicensePlate("");
       setModel("");
-      await fetchVehicles(); // Refresh list
+      await fetchVehicles();
     } catch (err: any) {
-      alert(err.message || "Failed to register vehicle");
+      setRegisterError(err.message || "Failed to register vehicle");
     } finally {
       setRegistering(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this vehicle?")) return;
+  const handleDelete = async (vehicleId: string, plate: string) => {
+    if (!confirm(`Delete vehicle "${plate}"? This cannot be undone.`)) return;
     try {
-      await vehicleApi.deleteVehicle(id);
-      await fetchVehicles(); // Refresh list
+      await vehicleApi.deleteVehicle(vehicleId);
+      await fetchVehicles();
     } catch (err: any) {
       alert(err.message || "Failed to delete vehicle");
     }
   };
 
   return (
-    <div className="p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-          My Vehicles
-        </h1>
-        <p className="text-gray-500 max-w-2xl">
-          Manage your registered vehicles. You can add new ones for automated
-          parking access.
-        </p>
+    <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--sea-ink)] mb-1">
+            My Vehicles
+          </h1>
+          <p className="text-[var(--sea-ink-soft)]">
+            Register and manage vehicles for parking access.
+          </p>
+        </div>
+        <button
+          onClick={fetchVehicles}
+          className="px-4 py-2 bg-[var(--surface)] border border-[var(--line)] text-[var(--sea-ink)] font-medium rounded-xl shadow-sm hover:border-indigo-500/30 transition-all flex items-center gap-2"
+        >
+          <RefreshCw size={16} />
+          Refresh
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Register Form */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-2 bg-blue-50 text-blue-600 rounded-lg">
-                <Car className="w-5 h-5" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* ── Registration Form ──────────────────────────────────── */}
+        <div className="lg:col-span-1">
+          <div className="dashboard-card p-6 space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500">
+                <Car size={18} />
               </div>
-              <h2 className="text-lg font-semibold text-gray-800">
-                Add Vehicle
-              </h2>
+              <div>
+                <h2 className="font-bold text-[var(--sea-ink)]">Add Vehicle</h2>
+                <p className="text-xs text-[var(--sea-ink-soft)]">
+                  Register a new vehicle to your account
+                </p>
+              </div>
             </div>
+
+            {registerError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm rounded-xl px-4 py-3">
+                {registerError}
+              </div>
+            )}
+            {registerSuccess && (
+              <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-sm rounded-xl px-4 py-3">
+                {registerSuccess}
+              </div>
+            )}
 
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">
-                  Licence Plate *
+                <label className="text-sm font-medium text-[var(--sea-ink)]">
+                  Licence Plate <span className="text-red-500">*</span>
                 </label>
                 <input
+                  id="vehicle-plate"
                   type="text"
                   required
-                  value={licencePlate}
-                  onChange={(e) => setLicencePlate(e.target.value)}
+                  value={licensePlate}
+                  onChange={(e) => setLicensePlate(e.target.value)}
                   placeholder="e.g. ABC-1234"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[var(--link-bg-hover)] border border-[var(--line)] text-[var(--sea-ink)] text-sm font-mono focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all placeholder:text-[var(--sea-ink-soft)]"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-gray-700">
-                  Model (Optional)
+                <label className="text-sm font-medium text-[var(--sea-ink)]">
+                  Model{" "}
+                  <span className="text-[var(--sea-ink-soft)] font-normal">
+                    (optional)
+                  </span>
                 </label>
                 <input
+                  id="vehicle-model"
                   type="text"
                   value={model}
                   onChange={(e) => setModel(e.target.value)}
                   placeholder="e.g. Tesla Model 3"
-                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
+                  className="w-full px-4 py-2.5 rounded-xl bg-[var(--link-bg-hover)] border border-[var(--line)] text-[var(--sea-ink)] text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all placeholder:text-[var(--sea-ink-soft)]"
                 />
               </div>
 
               <button
+                id="vehicle-register-submit"
                 type="submit"
                 disabled={registering}
-                className="w-full mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-70"
+                className="w-full mt-2 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.4)] hover:shadow-[0_6px_20px_rgba(79,70,229,0.3)] transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {registering ? (
-                  "Registering..."
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
                 ) : (
-                  <>
-                    <Plus className="w-4 h-4" /> Add Vehicle
-                  </>
+                  <Plus size={16} />
                 )}
+                {registering ? "Registering…" : "Add Vehicle"}
               </button>
             </form>
           </div>
         </div>
 
-        {/* Vehicles List */}
-        <div className="md:col-span-2">
+        {/* ── Vehicles List ──────────────────────────────────────── */}
+        <div className="lg:col-span-2">
           {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6">
+            <div className="bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl p-4 text-sm mb-5">
               {error}
             </div>
           )}
 
           {loading ? (
-            <div className="flex justify-center p-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="dashboard-card flex justify-center items-center p-16">
+              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
             </div>
           ) : vehicles.length === 0 ? (
-            <div className="bg-white border border-gray-100 border-dashed rounded-2xl flex flex-col items-center justify-center p-12 text-center h-full">
-              <div className="bg-gray-50 text-gray-400 p-4 rounded-full mb-4">
-                <Car className="w-8 h-8" />
+            <div className="dashboard-card flex flex-col items-center justify-center p-16 text-center min-h-[300px]">
+              <div className="p-5 bg-[var(--link-bg-hover)] text-[var(--sea-ink-soft)] rounded-full mb-4">
+                <Car size={32} />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-1">
-                No vehicles found
+              <h3 className="text-lg font-semibold text-[var(--sea-ink)] mb-1">
+                No vehicles yet
               </h3>
-              <p className="text-gray-500 text-sm max-w-sm">
-                You haven't registered any vehicles yet. Add your first one
-                using the form.
+              <p className="text-[var(--sea-ink-soft)] text-sm max-w-xs">
+                Register your first vehicle using the form to get started.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {vehicles.map((v) => (
-                <div
+                <VehicleCard
                   key={v.id}
-                  className="group bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all flex flex-col gap-4"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <div className="px-3 py-1 bg-gray-100 text-gray-800 rounded-md font-mono text-sm tracking-wide inline-block border border-gray-200">
-                        {v.licencePlate}
-                      </div>
-                      <p className="text-gray-500 text-sm font-medium">
-                        {v.model || "Unknown Model"}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => handleDelete(v.id)}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
-                      title="Delete Vehicle"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-50 flex items-center text-xs text-gray-400 justify-between">
-                    <span>ID: {v.id.substring(0, 8)}...</span>
-                  </div>
-                </div>
+                  vehicle={v}
+                  onDelete={() => handleDelete(v.id, v.licensePlate)}
+                />
               ))}
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Vehicle Card ──────────────────────────────────────────────────────────────
+function VehicleCard({
+  vehicle,
+  onDelete,
+}: {
+  vehicle: Vehicle;
+  onDelete: () => void;
+}) {
+  return (
+    <div className="dashboard-card p-5 group flex flex-col gap-4 hover:border-indigo-500/30">
+      <div className="flex justify-between items-start">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-500">
+            <Car size={18} />
+          </div>
+          <div>
+            <p className="font-mono font-bold text-[var(--sea-ink)] tracking-wider text-sm">
+              {vehicle.licensePlate}
+            </p>
+            <p className="text-[var(--sea-ink-soft)] text-xs mt-0.5">
+              {vehicle.model || "Unknown model"}
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={onDelete}
+          className="p-2 text-[var(--sea-ink-soft)] hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"
+          title="Delete vehicle"
+          id={`delete-vehicle-${vehicle.id}`}
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
+
+      <div className="pt-3 border-t border-[var(--line)] flex items-center justify-between">
+        <span className="text-xs text-[var(--sea-ink-soft)] font-mono">
+          ID: {vehicle.id.slice(0, 12)}…
+        </span>
+        <span className="text-xs px-2 py-1 bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 rounded-full font-semibold">
+          Active
+        </span>
       </div>
     </div>
   );

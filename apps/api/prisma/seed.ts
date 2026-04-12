@@ -32,14 +32,8 @@ function addHours(date: Date, hours: number) {
 
 // ── Slot definitions per floor ────────────────────────────────────────────────
 const SLOT_TYPES: SlotType[] = [
-  "standard",
-  "standard",
-  "standard",
-  "compact",
-  "compact",
-  "handicapped",
-  "ev_charging",
-  "ev_charging",
+  "standard", "standard", "standard", "compact", "compact", 
+  "handicapped", "ev_charging", "ev_charging"
 ];
 
 function buildSlots(prefix: string) {
@@ -54,151 +48,158 @@ function buildSlots(prefix: string) {
 async function main() {
   console.log("🌱 Seeding database…\n");
 
-  // ── 1. Admin user ───────────────────────────────────────────────────────────
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@parking.local" },
-    update: {},
-    create: {
-      name: "Admin",
-      email: "admin@parking.local",
-      phone: "+1-000-000-0000",
-      password: await hashPassword("Admin@1234"),
-      role: Role.admin,
+  // Wipe purely to ensure isolated seeding without constraints erroring over existing unique identifiers
+  await prisma.payment.deleteMany();
+  await prisma.booking.deleteMany();
+  await prisma.slot.deleteMany();
+  await prisma.floor.deleteMany();
+  await prisma.parkingLot.deleteMany();
+  await prisma.vehicle.deleteMany();
+  await prisma.user.deleteMany();
+
+  // ── 1. Create Users ─────────────────────────────────────────────────────────
+  const admin = await prisma.user.create({
+    data: {
+      name: "Admin", email: "admin@parking.local", phone: "+1-000-000-0000",
+      password: await hashPassword("Admin@1234"), role: Role.admin,
     },
   });
-  console.log(`✅ Admin user        → ${admin.email}`);
 
-  // ── 2. Driver user ──────────────────────────────────────────────────────────
-  const driver = await prisma.user.upsert({
-    where: { email: "driver@parking.local" },
-    update: {},
-    create: {
-      name: "Jane Driver",
-      email: "driver@parking.local",
-      phone: "+1-111-111-1111",
-      password: await hashPassword("Driver@1234"),
-      role: Role.driver,
+  const jane = await prisma.user.create({
+    data: {
+      name: "Jane Driver", email: "jane@parking.local", phone: "+1-111-111-1111",
+      password: await hashPassword("Driver@1234"), role: Role.driver,
     },
   });
-  console.log(`✅ Driver user       → ${driver.email}`);
 
-  // ── 3. Vehicle ──────────────────────────────────────────────────────────────
-  const vehicle = await prisma.vehicle.upsert({
-    where: { id: "seed-vehicle-001" },
-    update: {},
-    create: {
-      id: "seed-vehicle-001",
-      licensePlate: "ABC-1234",
-      model: "Toyota Camry",
-      userId: driver.id,
+  const bob = await prisma.user.create({
+    data: {
+      name: "Bob Builder", email: "bob@parking.local", phone: "+1-222-222-2222",
+      password: await hashPassword("Driver@1234"), role: Role.driver,
     },
   });
-  console.log(`✅ Vehicle           → ${vehicle.licensePlate} (${vehicle.model})`);
 
-  // ── 4. Parking lot A — Downtown ─────────────────────────────────────────────
-  const lotA = await prisma.parkingLot.upsert({
-    where: { id: "seed-lot-downtown" },
-    update: {},
-    create: {
-      id: "seed-lot-downtown",
+  const alice = await prisma.user.create({
+    data: {
+      name: "Alice Wonderland", email: "alice@parking.local", phone: "+1-333-333-3333",
+      password: await hashPassword("Driver@1234"), role: Role.driver,
+    },
+  });
+  console.log(`✅ Generated 4 Users (1 Admin, 3 Drivers)`);
+
+  // ── 2. Create Vehicles ──────────────────────────────────────────────────────
+  const v1 = await prisma.vehicle.create({ data: { licensePlate: "JANE-123", model: "Toyota Camry", userId: jane.id } });
+  const v2 = await prisma.vehicle.create({ data: { licensePlate: "JANE-EV", model: "Tesla Model 3", userId: jane.id } });
+  const v3 = await prisma.vehicle.create({ data: { licensePlate: "BOB-TRK", model: "Ford F-150", userId: bob.id } });
+  const v4 = await prisma.vehicle.create({ data: { licensePlate: "ALI-001", model: "Honda Civic", userId: alice.id } });
+  console.log(`✅ Generated 4 Vehicles`);
+
+  // ── 3. Create Infrastructure ────────────────────────────────────────────────
+  const lotA = await prisma.parkingLot.create({
+    data: {
       name: "Downtown Parking",
       address: "1 Main Street, Downtown",
       floors: {
         create: [
-          {
-            name: "Ground Floor",
-            level: 0,
-            slots: { create: buildSlots("DT-G") },
-          },
-          {
-            name: "First Floor",
-            level: 1,
-            slots: { create: buildSlots("DT-1") },
-          },
+          { name: "Ground Floor", level: 0, slots: { create: buildSlots("DT-G") } },
+          { name: "First Floor", level: 1, slots: { create: buildSlots("DT-1") } },
+          { name: "Second Floor", level: 2, slots: { create: buildSlots("DT-2") } },
         ],
       },
     },
     include: { floors: { include: { slots: true } } },
   });
-  console.log(
-    `✅ Parking lot A     → "${lotA.name}" (${lotA.floors.length} floors, ${lotA.floors.reduce((n, f) => n + f.slots.length, 0)} slots)`
-  );
 
-  // ── 5. Parking lot B — Airport ──────────────────────────────────────────────
-  const lotB = await prisma.parkingLot.upsert({
-    where: { id: "seed-lot-airport" },
-    update: {},
-    create: {
-      id: "seed-lot-airport",
+  const lotB = await prisma.parkingLot.create({
+    data: {
       name: "Airport Parking",
       address: "Terminal 1, International Airport",
       floors: {
         create: [
-          {
-            name: "Level P1",
-            level: 1,
-            slots: { create: buildSlots("AP-1") },
-          },
-          {
-            name: "Level P2",
-            level: 2,
-            slots: { create: buildSlots("AP-2") },
-          },
-          {
-            name: "Level P3",
-            level: 3,
-            slots: { create: buildSlots("AP-3") },
-          },
+          { name: "Level P1", level: 1, slots: { create: buildSlots("AP-1") } },
+          { name: "Level P2", level: 2, slots: { create: buildSlots("AP-2") } },
         ],
       },
     },
     include: { floors: { include: { slots: true } } },
   });
-  console.log(
-    `✅ Parking lot B     → "${lotB.name}" (${lotB.floors.length} floors, ${lotB.floors.reduce((n, f) => n + f.slots.length, 0)} slots)`
-  );
+  console.log(`✅ Generated Infrastructure (2 Lots, 5 Floors, 40 Slots)`);
 
-  // ── 6. Sample booking + payment (uses first slot of lot A, ground floor) ────
-  const targetSlot = lotA.floors[0].slots[0];
+  // ── 4. Inject Bookings ──────────────────────────────────────────────────────
   const now = new Date();
+  
+  // Helpers
+  const flatSlotsA = lotA.floors.flatMap(f => f.slots);
+  const flatSlotsB = lotB.floors.flatMap(f => f.slots);
 
-  const booking = await prisma.booking.upsert({
-    where: { id: "seed-booking-001" },
-    update: {},
-    create: {
-      id: "seed-booking-001",
-      startTime: now,
-      endTime: addHours(now, 2),
-      status: BookingStatus.confirmed,
-      userId: driver.id,
-      vehicleId: vehicle.id,
-      slotId: targetSlot.id,
-      payments: {
-        create: {
-          amount: 10.0,
-          status: PaymentStatus.completed,
-          paidAt: now,
-          userId: driver.id,
-        },
-      },
-    },
+  // A) Active Booking (Bob is currently parked)
+  await prisma.booking.create({
+    data: {
+      startTime: addHours(now, -1), endTime: addHours(now, 2), status: BookingStatus.active,
+      userId: bob.id, vehicleId: v3.id, slotId: flatSlotsA[3].id,
+      payments: { create: { amount: 15.0, status: PaymentStatus.completed, paidAt: addHours(now, -1), userId: bob.id } }
+    }
+  });
+  await prisma.slot.update({ where: { id: flatSlotsA[3].id }, data: { status: "occupied" } });
+
+  // B) Confirmed Booking (Alice has paid, hasn't arrived)
+  await prisma.booking.create({
+    data: {
+      startTime: addHours(now, 1), endTime: addHours(now, 3), status: BookingStatus.confirmed,
+      userId: alice.id, vehicleId: v4.id, slotId: flatSlotsA[4].id,
+      payments: { create: { amount: 10.0, status: PaymentStatus.completed, paidAt: addHours(now, -1), userId: alice.id } }
+    }
+  });
+  await prisma.slot.update({ where: { id: flatSlotsA[4].id }, data: { status: "reserved" } });
+
+  // C) Pending Bookings (Jane just applied for these 2 but hasn't paid yet)
+  await prisma.booking.create({
+    data: {
+      startTime: addHours(now, 2), endTime: addHours(now, 4), status: BookingStatus.pending,
+      userId: jane.id, vehicleId: v1.id, slotId: flatSlotsB[0].id,
+      payments: { create: { amount: 10.0, status: PaymentStatus.pending, userId: jane.id } }
+    }
+  });
+  await prisma.slot.update({ where: { id: flatSlotsB[0].id }, data: { status: "reserved" } });
+
+  await prisma.booking.create({
+    data: {
+      startTime: addHours(now, 2), endTime: addHours(now, 6), status: BookingStatus.pending,
+      userId: jane.id, vehicleId: v2.id, slotId: flatSlotsB[6].id, // EV
+      payments: { create: { amount: 20.0, status: PaymentStatus.pending, userId: jane.id } }
+    }
+  });
+  await prisma.slot.update({ where: { id: flatSlotsB[6].id }, data: { status: "reserved" } });
+
+  // D) Completed Bookings (Mocks historical traffic)
+  for (let i = 0; i < 5; i++) {
+    await prisma.booking.create({
+      data: {
+        startTime: addHours(now, -48 + i), endTime: addHours(now, -46 + i), status: BookingStatus.completed,
+        userId: bob.id, vehicleId: v3.id, slotId: flatSlotsA[10 + i].id,
+        payments: { create: { amount: 10.0, status: PaymentStatus.completed, paidAt: addHours(now, -48 + i), userId: bob.id } }
+      }
+    });
+  }
+
+  // E) Cancelled Booking
+  await prisma.booking.create({
+    data: {
+      startTime: addHours(now, -5), endTime: addHours(now, -3), status: BookingStatus.cancelled,
+      userId: alice.id, vehicleId: v4.id, slotId: flatSlotsA[5].id, // Slot freed
+      payments: { create: { amount: 10.0, status: PaymentStatus.failed, userId: alice.id } }
+    }
   });
 
-  // Mark that slot as reserved
-  await prisma.slot.update({
-    where: { id: targetSlot.id },
-    data: { status: "reserved" },
-  });
-
-  console.log(
-    `✅ Sample booking    → ID ${booking.id} (slot ${targetSlot.slotCode}, $10.00 paid)`
-  );
+  console.log(`✅ Generated 11 Bookings across varying lifecycle states & $105+ in registered payments`);
 
   console.log("\n🎉 Seed completed successfully!");
   console.log("\n  Credentials:");
   console.log("  ┌─────────────────────────────────────────────┐");
   console.log("  │  Admin   admin@parking.local  Admin@1234    │");
-  console.log("  │  Driver  driver@parking.local Driver@1234   │");
+  console.log("  │  Driver  jane@parking.local   Driver@1234   │");
+  console.log("  │  Driver  bob@parking.local    Driver@1234   │");
+  console.log("  │  Driver  alice@parking.local  Driver@1234   │");
   console.log("  └─────────────────────────────────────────────┘\n");
 }
 

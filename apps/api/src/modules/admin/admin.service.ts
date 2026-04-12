@@ -6,9 +6,31 @@ import { ISlotRepository } from "@/entities/slot/slot.repository";
 import { DBSlot } from "@/entities/slot/slot.types";
 import { IUserRepository } from "@/entities/user/user.repository";
 import { DBUser } from "@/entities/user/user.types";
+import prisma from "@/lib/prisma";
+
+export interface DashboardStats {
+  totalRevenueToday: number;
+  activeBookings: number;
+  vehiclesParked: number;
+  availableSlots: number;
+  totalSlots: number;
+}
+
+export interface RecentBooking {
+  id: string;
+  status: string;
+  startTime: Date;
+  endTime: Date;
+  createdAt: Date;
+  user: { id: string; name: string; email: string };
+  vehicle: { id: string; licensePlate: string; model: string | null };
+  slot: { id: string; slotCode: string; floorId: string };
+}
 
 export interface IAdminService {
   handleGetUsers(): Promise<DBUser[]>;
+  handleGetDashboardStats(): Promise<DashboardStats>;
+  handleGetRecentBookings(limit?: number): Promise<RecentBooking[]>;
   handleCreateFloor(data: { name: string }): Promise<DBFloor>;
   handleDeleteFloor(floorId: string): Promise<void>;
   handleCreateSlot(data: {
@@ -40,6 +62,64 @@ class AdminService implements IAdminService {
 
   public async handleGetUsers() {
     return this.userRepository.getAllUsers();
+  }
+
+  public async handleGetDashboardStats(): Promise<DashboardStats> {
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    // Total revenue from completed payments today
+    const revenueResult = await prisma.payment.aggregate({
+      where: {
+        status: "completed",
+        paidAt: { gte: todayStart, lte: todayEnd },
+      },
+      _sum: { amount: true },
+    });
+
+    // Active bookings (status = active or confirmed)
+    const activeBookings = await prisma.booking.count({
+      where: { status: { in: ["active", "confirmed"] } },
+    });
+
+    // Vehicles currently parked (slots with occupied status)
+    const vehiclesParked = await prisma.slot.count({
+      where: { status: "occupied" },
+    });
+
+    // Available vs total slots
+    const totalSlots = await prisma.slot.count();
+    const availableSlots = await prisma.slot.count({
+      where: { status: "available" },
+    });
+
+    return {
+      totalRevenueToday: revenueResult._sum.amount ?? 0,
+      activeBookings,
+      vehiclesParked,
+      availableSlots,
+      totalSlots,
+    };
+  }
+
+  public async handleGetRecentBookings(limit = 10): Promise<RecentBooking[]> {
+    const bookings = await prisma.booking.findMany({
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      select: {
+        id: true,
+        status: true,
+        startTime: true,
+        endTime: true,
+        createdAt: true,
+        user: { select: { id: true, name: true, email: true } },
+        vehicle: { select: { id: true, licensePlate: true, model: true } },
+        slot: { select: { id: true, slotCode: true, floorId: true } },
+      },
+    });
+    return bookings;
   }
 
   public async handleCreateFloor(data: { name: string }) {

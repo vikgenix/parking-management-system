@@ -1,3 +1,4 @@
+import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   ArrowUpRight,
@@ -5,11 +6,79 @@ import {
   CarFront,
   CheckCircle2,
   MapPin,
+  RefreshCw,
+  CalendarCheck,
 } from "lucide-react";
+import { adminApi, bookingApi, type DashboardStats, type RecentBooking } from "../lib/api";
+import { getUser } from "../lib/auth";
+import { Link } from "@tanstack/react-router";
 
-export const Route = createFileRoute("/")({ component: Dashboard });
+export const Route = createFileRoute("/")({ component: DashboardConfig });
 
-function Dashboard() {
+function DashboardConfig() {
+  const user = getUser();
+  
+  if (user?.role === "admin") {
+    return <AdminDashboard />;
+  }
+  
+  return <DriverDashboard />;
+}
+
+function AdminDashboard() {
+  const [stats, setStats] = React.useState<DashboardStats | null>(null);
+  const [bookings, setBookings] = React.useState<RecentBooking[]>([]);
+  const [loadingStats, setLoadingStats] = React.useState(true);
+  const [loadingBookings, setLoadingBookings] = React.useState(true);
+  const [statsError, setStatsError] = React.useState<string | null>(null);
+  const [bookingsError, setBookingsError] = React.useState<string | null>(null);
+
+  const fetchStats = async () => {
+    try {
+      setLoadingStats(true);
+      setStatsError(null);
+      const { stats: data } = await adminApi.getDashboardStats();
+      setStats(data);
+    } catch (err: any) {
+      setStatsError(err.message || "Failed to load stats");
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  const fetchBookings = async () => {
+    try {
+      setLoadingBookings(true);
+      setBookingsError(null);
+      const { bookings: data } = await adminApi.getRecentBookings(5);
+      setBookings(data);
+    } catch (err: any) {
+      setBookingsError(err.message || "Failed to load bookings");
+    } finally {
+      setLoadingBookings(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchStats();
+    fetchBookings();
+  }, []);
+
+  const refresh = () => {
+    fetchStats();
+    fetchBookings();
+  };
+
+  // Capacity percentage: occupied vs total
+  const capacity =
+    stats && stats.totalSlots > 0
+      ? Math.round(
+          ((stats.totalSlots - stats.availableSlots) / stats.totalSlots) * 100,
+        )
+      : 0;
+  // SVG ring: r=70 → circumference ≈ 440
+  const strokeDashoffset = Math.round(440 - (440 * capacity) / 100);
+
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in duration-500">
       {/* Welcome Section */}
@@ -23,43 +92,60 @@ function Dashboard() {
           </p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-[var(--surface)] border border-[var(--line)] text-[var(--sea-ink)] font-medium rounded-xl shadow-sm hover:border-indigo-500/30 transition-all">
-            Download Report
-          </button>
-          <button className="px-4 py-2 bg-indigo-600 text-white font-medium rounded-xl shadow-[0_4px_14px_rgba(79,70,229,0.39)] hover:bg-indigo-500 hover:shadow-[0_6px_20px_rgba(79,70,229,0.23)] transition-all">
-            New Booking
+          <button
+            onClick={refresh}
+            className="px-4 py-2 bg-[var(--surface)] border border-[var(--line)] text-[var(--sea-ink)] font-medium rounded-xl shadow-sm hover:border-indigo-500/30 transition-all flex items-center gap-2"
+          >
+            <RefreshCw size={16} />
+            Refresh
           </button>
         </div>
       </div>
+
+      {/* Stats Error */}
+      {statsError && (
+        <div className="bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl p-4 text-sm">
+          {statsError}
+        </div>
+      )}
 
       {/* Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard
           title="Total Revenue (Today)"
-          value="$4,250.00"
-          trend="+12.5%"
+          value={
+            loadingStats
+              ? "—"
+              : `$${(stats?.totalRevenueToday ?? 0).toFixed(2)}`
+          }
+          sub={loadingStats ? "Loading…" : undefined}
           icon={<Banknote />}
           color="text-emerald-500"
         />
         <MetricCard
           title="Active Bookings"
-          value="142"
-          trend="+8.2%"
+          value={loadingStats ? "—" : `${stats?.activeBookings ?? 0}`}
+          sub={loadingStats ? "Loading…" : undefined}
           icon={<CheckCircle2 />}
           color="text-indigo-500"
         />
         <MetricCard
           title="Vehicles Parked"
-          value="128"
-          trend="+3.1%"
+          value={loadingStats ? "—" : `${stats?.vehiclesParked ?? 0}`}
+          sub={loadingStats ? "Loading…" : undefined}
           icon={<CarFront />}
           color="text-blue-500"
         />
         <MetricCard
           title="Available Slots"
-          value="45"
-          trend="-12.4%"
-          trendDown
+          value={loadingStats ? "—" : `${stats?.availableSlots ?? 0}`}
+          sub={
+            loadingStats
+              ? "Loading…"
+              : stats
+                ? `of ${stats.totalSlots} total`
+                : undefined
+          }
           icon={<MapPin />}
           color="text-cyan-500"
         />
@@ -67,16 +153,22 @@ function Dashboard() {
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Activity Table (Spans 2 columns) */}
+        {/* Recent Bookings Table (Spans 2 columns) */}
         <div className="lg:col-span-2 dashboard-card p-6 min-h-[400px]">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-[var(--sea-ink)]">
-              Recent Arrivals & Departures
+              Recent Bookings
             </h2>
             <button className="text-sm font-medium text-indigo-500 hover:text-indigo-400 flex items-center gap-1">
               View All <ArrowUpRight size={16} />
             </button>
           </div>
+
+          {bookingsError && (
+            <div className="bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl p-3 text-sm mb-4">
+              {bookingsError}
+            </div>
+          )}
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-sm text-[var(--sea-ink-soft)]">
@@ -89,47 +181,36 @@ function Dashboard() {
                 </tr>
               </thead>
               <tbody className="flex flex-col gap-2">
-                <TableRow
-                  user="Alex Johnson"
-                  plate="XYZ-987"
-                  slot="F1-A12"
-                  status="Active"
-                  time="10 mins ago"
-                />
-                <TableRow
-                  user="Maria Garcia"
-                  plate="ABC-123"
-                  slot="F2-B05"
-                  status="Completed"
-                  time="45 mins ago"
-                />
-                <TableRow
-                  user="James Smith"
-                  plate="DEF-456"
-                  slot="F1-A01"
-                  status="Pending"
-                  time="1 hour ago"
-                />
-                <TableRow
-                  user="Sarah Williams"
-                  plate="GHJ-789"
-                  slot="F3-C22"
-                  status="Active"
-                  time="2 hours ago"
-                />
-                <TableRow
-                  user="Michael Brown"
-                  plate="JKL-012"
-                  slot="F2-B11"
-                  status="Completed"
-                  time="3 hours ago"
-                />
+                {loadingBookings ? (
+                  <tr className="w-full">
+                    <td className="p-8 flex justify-center w-full">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500" />
+                    </td>
+                  </tr>
+                ) : bookings.length === 0 ? (
+                  <tr className="w-full">
+                    <td className="text-center py-12 text-[var(--sea-ink-soft)] text-sm w-full block">
+                      No bookings found.
+                    </td>
+                  </tr>
+                ) : (
+                  bookings.map((b) => (
+                    <TableRow
+                      key={b.id}
+                      user={b.user.name}
+                      plate={b.vehicle.licensePlate}
+                      slot={b.slot.slotCode}
+                      status={b.status}
+                      time={timeAgo(b.createdAt)}
+                    />
+                  ))
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        {/* Action Panel Sidebar */}
+        {/* Facility Status Sidebar */}
         <div className="dashboard-card p-6 flex flex-col">
           <h2 className="text-lg font-bold text-[var(--sea-ink)] mb-6">
             Facility Status
@@ -153,13 +234,13 @@ function Dashboard() {
                   strokeWidth="12"
                   fill="none"
                   strokeDasharray="440"
-                  strokeDashoffset="110"
+                  strokeDashoffset={loadingStats ? 440 : strokeDashoffset}
                   className="transition-all duration-1000 ease-out"
                 />
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-3xl font-bold text-[var(--sea-ink)]">
-                  75%
+                  {loadingStats ? "—" : `${capacity}%`}
                 </span>
                 <span className="text-xs font-medium text-[var(--sea-ink-soft)] uppercase tracking-wide">
                   Capacity
@@ -167,8 +248,11 @@ function Dashboard() {
               </div>
             </div>
             <p className="text-sm text-[var(--sea-ink-soft)] mt-4">
-              Peak hours approaching. Floor 1 is currently operating at 95%
-              capacity.
+              {loadingStats
+                ? "Loading facility data…"
+                : stats
+                  ? `${stats.availableSlots} of ${stats.totalSlots} slots are currently available.`
+                  : "No data available."}
             </p>
           </div>
         </div>
@@ -177,15 +261,32 @@ function Dashboard() {
   );
 }
 
-// Helper Components for clean Mockups
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function timeAgo(iso: string) {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min${mins !== 1 ? "s" : ""} ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs} hour${hrs !== 1 ? "s" : ""} ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days} day${days !== 1 ? "s" : ""} ago`;
+}
+
+// ── Sub-components ────────────────────────────────────────────────────────────
 function MetricCard({
   title,
   value,
-  trend,
+  sub,
   icon,
   color,
-  trendDown = false,
-}: any) {
+}: {
+  title: string;
+  value: string;
+  sub?: string;
+  icon: React.ReactNode;
+  color: string;
+}) {
   return (
     <div className="dashboard-card p-5 flex flex-col gap-4">
       <div className="flex items-start justify-between">
@@ -199,19 +300,39 @@ function MetricCard({
           {icon}
         </div>
       </div>
-      <div className="flex items-center gap-2 text-sm">
-        <span
-          className={`font-medium px-2 py-0.5 rounded-md ${trendDown ? "bg-red-500/10 text-red-500" : "bg-emerald-500/10 text-emerald-500"}`}
-        >
-          {trend}
-        </span>
-        <span className="text-[var(--sea-ink-soft)]">vs last weak</span>
-      </div>
+      {sub && (
+        <p className="text-xs text-[var(--sea-ink-soft)]">{sub}</p>
+      )}
     </div>
   );
 }
 
-function TableRow({ user, plate, slot, status, time }: any) {
+function TableRow({
+  user,
+  plate,
+  slot,
+  status,
+  time,
+}: {
+  user: string;
+  plate: string;
+  slot: string;
+  status: string;
+  time: string;
+}) {
+  const statusLabel =
+    status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+  const statusClass =
+    status === "active"
+      ? "bg-emerald-500/10 text-emerald-500"
+      : status === "completed"
+        ? "bg-indigo-500/10 text-indigo-500"
+        : status === "confirmed"
+          ? "bg-blue-500/10 text-blue-500"
+          : status === "cancelled" || status === "expired"
+            ? "bg-red-500/10 text-red-500"
+            : "bg-amber-500/10 text-amber-500";
+
   return (
     <tr className="w-full flex justify-between items-center bg-[var(--link-bg-hover)] p-3 rounded-xl hover:bg-[var(--line)] transition-colors border border-transparent">
       <td className="w-1/4 font-medium text-[var(--sea-ink)] flex items-center gap-2">
@@ -228,12 +349,107 @@ function TableRow({ user, plate, slot, status, time }: any) {
       </td>
       <td className="w-1/4 text-right flex flex-col items-end">
         <span
-          className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${status === "Active" ? "bg-emerald-500/10 text-emerald-500" : status === "Completed" ? "bg-indigo-500/10 text-indigo-500" : "bg-amber-500/10 text-amber-500"}`}
+          className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full ${statusClass}`}
         >
-          {status}
+          {statusLabel}
         </span>
         <span className="text-xs text-[var(--sea-ink-soft)] mt-1">{time}</span>
       </td>
     </tr>
+  );
+}
+
+// ── Driver Dashboard ──────────────────────────────────────────────────────────
+function DriverDashboard() {
+  const user = getUser();
+  const [stats, setStats] = React.useState({ active: 0, pending: 0, total: 0 });
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function loadDriverData() {
+      try {
+        const { bookings } = await bookingApi.getMyBookings();
+        setStats({
+          active: bookings.filter((b: any) => b.status === "active" || b.status === "confirmed").length,
+          pending: bookings.filter((b: any) => b.status === "pending").length,
+          total: bookings.length,
+        });
+      } catch (err) {
+        // error handling omitted for brevity on dashboard overview
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadDriverData();
+  }, []);
+
+  return (
+    <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-[var(--sea-ink)] mb-1">
+          Welcome back, {user?.name.split(" ")[0]}!
+        </h1>
+        <p className="text-[var(--sea-ink-soft)]">
+          Manage your parking reservations and vehicles.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <MetricCard
+          title="Active Parking"
+          value={loading ? "—" : stats.active.toString()}
+          icon={<CheckCircle2 />}
+          color="text-emerald-500"
+        />
+        <MetricCard
+          title="Pending Payments"
+          value={loading ? "—" : stats.pending.toString()}
+          icon={<Banknote />}
+          color="text-amber-500"
+        />
+        <MetricCard
+          title="Total Bookings"
+          value={loading ? "—" : stats.total.toString()}
+          icon={<CalendarCheck />}
+          color="text-indigo-500"
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        {/* Quick Action: Book */}
+        <div className="dashboard-card p-6 flex flex-col items-center justify-center text-center space-y-4 min-h-[250px] border-2 border-dashed border-indigo-500/30 hover:border-indigo-500 transition-colors">
+          <div className="p-4 bg-indigo-500/10 rounded-full text-indigo-500 mb-2">
+            <MapPin size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-[var(--sea-ink)]">Need a spot?</h2>
+          <p className="text-[var(--sea-ink-soft)] max-w-[250px]">
+            Find an available parking space and make a new reservation instantly.
+          </p>
+          <Link
+            to="/book-slot"
+            className="mt-4 px-6 py-2.5 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-500 transition-all shadow-md active:scale-95"
+          >
+            Find Parking
+          </Link>
+        </div>
+
+        {/* Quick Action: Vehicles */}
+        <div className="dashboard-card p-6 flex flex-col items-center justify-center text-center space-y-4 min-h-[250px]">
+          <div className="p-4 bg-cyan-500/10 rounded-full text-cyan-500 mb-2">
+            <CarFront size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-[var(--sea-ink)]">My Vehicles</h2>
+          <p className="text-[var(--sea-ink-soft)] max-w-[250px]">
+            Manage your registered license plates to access automated gates.
+          </p>
+          <Link
+            to="/vehicles"
+            className="mt-4 px-6 py-2.5 bg-[var(--surface-strong)] text-[var(--sea-ink)] font-semibold rounded-xl hover:bg-[var(--line)] border border-[var(--line)] transition-all shadow-sm active:scale-95"
+          >
+            Manage Vehicles
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
