@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { CalendarCheck, RefreshCw } from "lucide-react";
 import { adminApi } from "../lib/api";
 import type { RecentBooking } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 export const Route = createFileRoute("/bookings")({ component: BookingsPage });
 
@@ -169,16 +170,21 @@ export default function BookingsPage() {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-16 text-center">
-            <CalendarCheck
-              size={40}
-              className="text-[var(--sea-ink-soft)] mb-4 opacity-40"
-            />
-            <p className="text-[var(--sea-ink-soft)] text-sm">
-              No bookings found
-              {statusFilter !== "all" ? ` with status "${statusFilter}"` : ""}.
-            </p>
-          </div>
+          <EmptyState
+            illustration={statusFilter !== "all" ? "search" : "calendar"}
+            title={
+              statusFilter !== "all"
+                ? `No "${statusFilter}" bookings`
+                : "No bookings found"
+            }
+            description={
+              statusFilter !== "all"
+                ? `There are no bookings matching the "${statusFilter}" filter. Try selecting a different status.`
+                : "No parking bookings have been made yet. They will appear here once drivers start reserving spots."
+            }
+            actionLabel={statusFilter !== "all" ? "Clear filter" : undefined}
+            onAction={statusFilter !== "all" ? () => setStatusFilter("all") : undefined}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">

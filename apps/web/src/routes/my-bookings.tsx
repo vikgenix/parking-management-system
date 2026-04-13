@@ -8,6 +8,7 @@ import {
   MapPin,
 } from "lucide-react";
 import { bookingApi } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 export const Route = createFileRoute("/my-bookings")({
   component: MyBookingsPage,
@@ -80,17 +81,14 @@ function MyBookingsPage() {
       )}
 
       {bookings.length === 0 ? (
-        <div className="dashboard-card p-12 text-center flex flex-col items-center justify-center">
-          <div className="w-16 h-16 bg-[var(--line)] rounded-full flex items-center justify-center text-[var(--sea-ink-soft)] mb-4">
-            <CalendarCheck size={28} />
-          </div>
-          <h3 className="text-lg font-bold text-[var(--sea-ink)]">
-            No bookings yet
-          </h3>
-          <p className="text-sm text-[var(--sea-ink-soft)] mt-2 max-w-sm">
-            You haven't made any parking reservations. Let's get you set up with
-            a guaranteed spot!
-          </p>
+        <div className="dashboard-card">
+          <EmptyState
+            illustration="calendar"
+            title="No bookings yet"
+            description="You haven't made any parking reservations yet. Find an available spot and book it instantly."
+            actionLabel="Find Parking"
+            actionTo="/book-slot"
+          />
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4">

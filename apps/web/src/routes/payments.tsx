@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { adminApi } from "../lib/api";
 import type { DashboardStats, RecentBooking } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 export const Route = createFileRoute("/payments")({ component: PaymentsPage });
 
@@ -234,15 +235,11 @@ function PaymentsPage() {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
           </div>
         ) : bookings.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-16 text-center">
-            <CreditCard
-              size={40}
-              className="text-[var(--sea-ink-soft)] mb-4 opacity-40"
-            />
-            <p className="text-[var(--sea-ink-soft)] text-sm">
-              No transactions found.
-            </p>
-          </div>
+          <EmptyState
+            illustration="receipt"
+            title="No transactions yet"
+            description="Payment transactions will appear here once drivers start booking and paying for parking spots."
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">

@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { RefreshCw, ShieldAlert, Users } from "lucide-react";
 import { adminApi } from "../lib/api";
 import type { AdminUser } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 export const Route = createFileRoute("/users")({ component: UsersPage });
 
@@ -129,15 +130,17 @@ function UsersPage() {
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-16 text-center">
-            <Users
-              size={40}
-              className="text-[var(--sea-ink-soft)] mb-4 opacity-40"
-            />
-            <p className="text-[var(--sea-ink-soft)] text-sm">
-              {search ? "No users match your search." : "No users found."}
-            </p>
-          </div>
+          <EmptyState
+            illustration={search ? "search" : "users"}
+            title={search ? "No users match your search" : "No users found"}
+            description={
+              search
+                ? `No results for "${search}". Try adjusting your search terms.`
+                : "No users have registered yet. They will appear here once drivers and admins sign up."
+            }
+            actionLabel={search ? "Clear search" : undefined}
+            onAction={search ? () => setSearch("") : undefined}
+          />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm text-left">

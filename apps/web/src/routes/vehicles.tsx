@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Car, Plus, RefreshCw, Trash2 } from "lucide-react";
 import { vehicleApi } from "../lib/api";
 import type { Vehicle } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 export const Route = createFileRoute("/vehicles")({
   component: VehiclesComponent,
@@ -184,16 +185,12 @@ function VehiclesComponent() {
               <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-500" />
             </div>
           ) : vehicles.length === 0 ? (
-            <div className="dashboard-card flex flex-col items-center justify-center p-16 text-center min-h-[300px]">
-              <div className="p-5 bg-[var(--link-bg-hover)] text-[var(--sea-ink-soft)] rounded-full mb-4">
-                <Car size={32} />
-              </div>
-              <h3 className="text-lg font-semibold text-[var(--sea-ink)] mb-1">
-                No vehicles yet
-              </h3>
-              <p className="text-[var(--sea-ink-soft)] text-sm max-w-xs">
-                Register your first vehicle using the form to get started.
-              </p>
+            <div className="dashboard-card min-h-[300px] flex items-center justify-center">
+              <EmptyState
+                illustration="car"
+                title="No vehicles yet"
+                description="Register your first vehicle using the form on the left to get started with parking reservations."
+              />
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

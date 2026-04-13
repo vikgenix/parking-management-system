@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Car, CheckCircle2, CreditCard, MapPin } from "lucide-react";
 import { bookingApi, vehicleApi } from "../lib/api";
 import type { Vehicle } from "../lib/api";
+import { EmptyState } from "../components/EmptyState";
 
 export const Route = createFileRoute("/book-slot")({
   component: BookSlotPage,
@@ -117,9 +118,11 @@ function BookSlotPage() {
                 <MapPin className="text-indigo-500" /> Select Available Spot
               </h2>
               {slots.length === 0 ? (
-                <p className="text-[var(--sea-ink-soft)] text-sm">
-                  No spots are currently available.
-                </p>
+                <EmptyState
+                  illustration="parking"
+                  title="All spots are taken"
+                  description="Every parking slot is currently reserved or occupied. Check back shortly — spots free up regularly."
+                />
               ) : (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {slots.map((slot) => (
