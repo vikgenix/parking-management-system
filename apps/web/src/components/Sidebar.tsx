@@ -83,11 +83,7 @@ export default function Sidebar() {
         {isAdmin && (
           <>
             <SectionLabel label="People" />
-            <SidebarLink
-              to="/users"
-              icon={<Users size={18} />}
-              label="Users"
-            />
+            <SidebarLink to="/users" icon={<Users size={18} />} label="Users" />
 
             <SectionLabel label="Finance" />
             <SidebarLink

@@ -1,15 +1,14 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { RefreshCw, ShieldAlert, Users } from "lucide-react";
-import { adminApi, type AdminUser } from "../lib/api";
+import { adminApi } from "../lib/api";
+import type { AdminUser } from "../lib/api";
 
 export const Route = createFileRoute("/users")({ component: UsersPage });
 
 const ROLE_STYLES: Record<string, string> = {
-  admin:
-    "bg-purple-500/10 text-purple-500 border border-purple-500/20",
-  driver:
-    "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20",
+  admin: "bg-purple-500/10 text-purple-500 border border-purple-500/20",
+  driver: "bg-indigo-500/10 text-indigo-500 border border-indigo-500/20",
 };
 
 function formatDate(iso: string) {
@@ -30,7 +29,7 @@ function getInitials(name: string) {
 }
 
 function UsersPage() {
-  const [users, setUsers] = React.useState<AdminUser[]>([]);
+  const [users, setUsers] = React.useState<Array<AdminUser>>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [search, setSearch] = React.useState("");
@@ -131,7 +130,10 @@ function UsersPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-16 text-center">
-            <Users size={40} className="text-[var(--sea-ink-soft)] mb-4 opacity-40" />
+            <Users
+              size={40}
+              className="text-[var(--sea-ink-soft)] mb-4 opacity-40"
+            />
             <p className="text-[var(--sea-ink-soft)] text-sm">
               {search ? "No users match your search." : "No users found."}
             </p>
@@ -224,7 +226,9 @@ function SummaryCard({
         {icon}
       </div>
       <div>
-        <p className="text-sm font-medium text-[var(--sea-ink-soft)]">{label}</p>
+        <p className="text-sm font-medium text-[var(--sea-ink-soft)]">
+          {label}
+        </p>
         <p className="text-2xl font-bold text-[var(--sea-ink)]">{value}</p>
       </div>
     </div>

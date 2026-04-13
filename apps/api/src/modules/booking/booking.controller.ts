@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
-import { OK, CREATED, INTERNAL_SERVER_ERROR, BAD_REQUEST } from "@/constants/httpStatusCodes";
+import {
+  OK,
+  CREATED,
+  BAD_REQUEST,
+} from "@/constants/httpStatusCodes";
 import { IBookingService } from "./booking.service";
-import AppError, { AppErrorCode } from "@/utils/AppError";
+import AppError from "@/utils/AppError";
 
 class BookingController {
   constructor(private bookingService: IBookingService) {}
@@ -25,10 +29,20 @@ class BookingController {
         throw new AppError(BAD_REQUEST, "Missing required booking details");
       }
 
-      const result = await this.bookingService.handleCreateBooking(userId, vehicleId, slotId, startTime, endTime);
+      const result = await this.bookingService.handleCreateBooking(
+        userId,
+        vehicleId,
+        slotId,
+        startTime,
+        endTime
+      );
       res.status(CREATED).json(result);
-    } catch (error: any) {
-      next(new AppError(BAD_REQUEST, error.message || "Failed to create booking"));
+    } catch (error) {
+      if (error instanceof Error) {
+        next(new AppError(BAD_REQUEST, error.message || "Failed to create booking"));
+      } else {
+        next(new AppError(BAD_REQUEST, "Failed to create booking"));
+      }
     }
   };
 
@@ -52,8 +66,12 @@ class BookingController {
 
       const result = await this.bookingService.handlePayBooking(userId, id);
       res.status(OK).json(result);
-    } catch (error: any) {
-      next(new AppError(BAD_REQUEST, error.message || "Failed to pay booking"));
+    } catch (error) {
+      if (error instanceof Error) {
+        next(new AppError(BAD_REQUEST, error.message || "Failed to pay booking"));
+      } else {
+        next(new AppError(BAD_REQUEST, "Failed to pay booking"));
+      }
     }
   };
 }

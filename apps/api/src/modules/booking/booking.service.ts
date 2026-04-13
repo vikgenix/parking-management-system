@@ -1,10 +1,17 @@
 import prisma from "@/lib/prisma";
+import { Booking, Payment, Slot } from "@/generated/prisma/client";
 
 export interface IBookingService {
-  handleGetAvailableSlots(): Promise<any[]>;
-  handleCreateBooking(userId: string, vehicleId: string, slotId: string, startTime: Date, endTime: Date): Promise<any>;
-  handleGetMyBookings(userId: string): Promise<any[]>;
-  handlePayBooking(userId: string, bookingId: string): Promise<any>;
+  handleGetAvailableSlots(): Promise<Slot[]>;
+  handleCreateBooking(
+    userId: string,
+    vehicleId: string,
+    slotId: string,
+    startTime: Date,
+    endTime: Date
+  ): Promise<{ booking: Booking; payment: Payment }>;
+  handleGetMyBookings(userId: string): Promise<Booking[]>;
+  handlePayBooking(userId: string, bookingId: string): Promise<{ success: boolean }>;
 }
 
 class BookingService implements IBookingService {
@@ -13,13 +20,23 @@ class BookingService implements IBookingService {
       where: { status: "available" },
       include: {
         floor: {
-          select: { name: true, level: true, parkingLot: { select: { name: true } } },
+          select: {
+            name: true,
+            level: true,
+            parkingLot: { select: { name: true } },
+          },
         },
       },
     });
   }
 
-  public async handleCreateBooking(userId: string, vehicleId: string, slotId: string, startTime: Date, endTime: Date) {
+  public async handleCreateBooking(
+    userId: string,
+    vehicleId: string,
+    slotId: string,
+    startTime: Date,
+    endTime: Date
+  ) {
     // Basic verification that slot is available
     const slot = await prisma.slot.findUnique({ where: { id: slotId } });
     if (!slot || slot.status !== "available") {

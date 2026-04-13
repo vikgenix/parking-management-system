@@ -1,33 +1,33 @@
 import * as React from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { Link, createFileRoute } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   Banknote,
+  CalendarCheck,
   CarFront,
   CheckCircle2,
   MapPin,
   RefreshCw,
-  CalendarCheck,
 } from "lucide-react";
-import { adminApi, bookingApi, type DashboardStats, type RecentBooking } from "../lib/api";
+import { adminApi, bookingApi } from "../lib/api";
 import { getUser } from "../lib/auth";
-import { Link } from "@tanstack/react-router";
+import type { DashboardStats, RecentBooking } from "../lib/api";
 
 export const Route = createFileRoute("/")({ component: DashboardConfig });
 
 function DashboardConfig() {
   const user = getUser();
-  
+
   if (user?.role === "admin") {
     return <AdminDashboard />;
   }
-  
+
   return <DriverDashboard />;
 }
 
 function AdminDashboard() {
   const [stats, setStats] = React.useState<DashboardStats | null>(null);
-  const [bookings, setBookings] = React.useState<RecentBooking[]>([]);
+  const [bookings, setBookings] = React.useState<Array<RecentBooking>>([]);
   const [loadingStats, setLoadingStats] = React.useState(true);
   const [loadingBookings, setLoadingBookings] = React.useState(true);
   const [statsError, setStatsError] = React.useState<string | null>(null);
@@ -300,9 +300,7 @@ function MetricCard({
           {icon}
         </div>
       </div>
-      {sub && (
-        <p className="text-xs text-[var(--sea-ink-soft)]">{sub}</p>
-      )}
+      {sub && <p className="text-xs text-[var(--sea-ink-soft)]">{sub}</p>}
     </div>
   );
 }
@@ -370,7 +368,9 @@ function DriverDashboard() {
       try {
         const { bookings } = await bookingApi.getMyBookings();
         setStats({
-          active: bookings.filter((b: any) => b.status === "active" || b.status === "confirmed").length,
+          active: bookings.filter(
+            (b: any) => b.status === "active" || b.status === "confirmed",
+          ).length,
           pending: bookings.filter((b: any) => b.status === "pending").length,
           total: bookings.length,
         });
@@ -421,9 +421,12 @@ function DriverDashboard() {
           <div className="p-4 bg-indigo-500/10 rounded-full text-indigo-500 mb-2">
             <MapPin size={32} />
           </div>
-          <h2 className="text-xl font-bold text-[var(--sea-ink)]">Need a spot?</h2>
+          <h2 className="text-xl font-bold text-[var(--sea-ink)]">
+            Need a spot?
+          </h2>
           <p className="text-[var(--sea-ink-soft)] max-w-[250px]">
-            Find an available parking space and make a new reservation instantly.
+            Find an available parking space and make a new reservation
+            instantly.
           </p>
           <Link
             to="/book-slot"
@@ -438,7 +441,9 @@ function DriverDashboard() {
           <div className="p-4 bg-cyan-500/10 rounded-full text-cyan-500 mb-2">
             <CarFront size={32} />
           </div>
-          <h2 className="text-xl font-bold text-[var(--sea-ink)]">My Vehicles</h2>
+          <h2 className="text-xl font-bold text-[var(--sea-ink)]">
+            My Vehicles
+          </h2>
           <p className="text-[var(--sea-ink-soft)] max-w-[250px]">
             Manage your registered license plates to access automated gates.
           </p>

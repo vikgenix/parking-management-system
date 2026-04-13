@@ -1,13 +1,6 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import {
-  Building2,
-  Layers,
-  MapPin,
-  Plus,
-  Trash2,
-  Zap,
-} from "lucide-react";
+import { Building2, Layers, MapPin, Plus, Trash2, Zap } from "lucide-react";
 import { adminApi } from "../lib/api";
 
 export const Route = createFileRoute("/parking-management")({
@@ -35,7 +28,7 @@ const SLOT_TYPE_COLORS: Record<SlotType, string> = {
 // ── Tab config ─────────────────────────────────────────────────────────────────
 type Tab = "parking-lot" | "floor" | "slot";
 
-const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
+const TABS: Array<{ id: Tab; label: string; icon: React.ReactNode }> = [
   { id: "parking-lot", label: "Parking Lots", icon: <Building2 size={16} /> },
   { id: "floor", label: "Floors", icon: <Layers size={16} /> },
   { id: "slot", label: "Slots", icon: <MapPin size={16} /> },
@@ -179,8 +172,14 @@ function ParkingLotPanel({
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await adminApi.createParkingLot({ name: name.trim(), address: address.trim() });
-      showToast("success", `Created parking lot "${res.parkingLot?.name ?? name}"`);
+      const res = await adminApi.createParkingLot({
+        name: name.trim(),
+        address: address.trim(),
+      });
+      showToast(
+        "success",
+        `Created parking lot "${res.parkingLot?.name ?? name}"`,
+      );
       setName("");
       setAddress("");
     } catch (err: any) {
@@ -507,7 +506,7 @@ function SlotPanel({
                   "compact",
                   "handicapped",
                   "ev_charging",
-                ] as SlotType[]
+                ] as Array<SlotType>
               ).map((type) => (
                 <button
                   key={type}

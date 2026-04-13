@@ -21,8 +21,7 @@ type ResourceType = "floor" | "slot" | "parking-lot";
 function AdminToolsComponent() {
   // ── Delete state ──────────────────────────────────────────────────────────
   const [targetId, setTargetId] = React.useState("");
-  const [resourceType, setResourceType] =
-    React.useState<ResourceType>("floor");
+  const [resourceType, setResourceType] = React.useState<ResourceType>("floor");
   const [deleteLoading, setDeleteLoading] = React.useState(false);
   const [deleteMessage, setDeleteMessage] = React.useState<{
     type: "success" | "error";
@@ -371,23 +370,23 @@ function AdminToolsComponent() {
                   Resource Type
                 </label>
                 <div className="flex bg-[var(--link-bg-hover)] border border-[var(--line)] p-1 rounded-xl">
-                  {(["floor", "slot", "parking-lot"] as ResourceType[]).map(
-                    (t) => (
-                      <button
-                        key={t}
-                        type="button"
-                        id={`delete-type-${t}`}
-                        onClick={() => setResourceType(t)}
-                        className={`flex-1 text-sm font-medium py-2 rounded-lg capitalize transition-colors ${
-                          resourceType === t
-                            ? "bg-[var(--surface)] text-[var(--sea-ink)] shadow-sm border border-[var(--line)]"
-                            : "text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]"
-                        }`}
-                      >
-                        {t.replace("-", " ")}
-                      </button>
-                    ),
-                  )}
+                  {(
+                    ["floor", "slot", "parking-lot"] as Array<ResourceType>
+                  ).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      id={`delete-type-${t}`}
+                      onClick={() => setResourceType(t)}
+                      className={`flex-1 text-sm font-medium py-2 rounded-lg capitalize transition-colors ${
+                        resourceType === t
+                          ? "bg-[var(--surface)] text-[var(--sea-ink)] shadow-sm border border-[var(--line)]"
+                          : "text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]"
+                      }`}
+                    >
+                      {t.replace("-", " ")}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -451,9 +450,11 @@ function AdminInput({
 }
 
 const COLOR_MAP: Record<string, string> = {
-  indigo: "bg-indigo-600 hover:bg-indigo-500 shadow-[0_4px_14px_rgba(79,70,229,0.3)]",
+  indigo:
+    "bg-indigo-600 hover:bg-indigo-500 shadow-[0_4px_14px_rgba(79,70,229,0.3)]",
   cyan: "bg-cyan-600 hover:bg-cyan-500 shadow-[0_4px_14px_rgba(6,182,212,0.3)]",
-  emerald: "bg-emerald-600 hover:bg-emerald-500 shadow-[0_4px_14px_rgba(5,150,105,0.3)]",
+  emerald:
+    "bg-emerald-600 hover:bg-emerald-500 shadow-[0_4px_14px_rgba(5,150,105,0.3)]",
 };
 
 function AdminBtn({
