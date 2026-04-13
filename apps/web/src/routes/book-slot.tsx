@@ -98,12 +98,15 @@ const SLOT_TYPE_META: Record<
 };
 
 function SlotTypeBadge({ type }: { type: string }) {
-  const meta = SLOT_TYPE_META[type as SlotType] ?? {
-    label: type,
-    icon: null,
-    color: "text-[var(--sea-ink-soft)]",
-    bg: "bg-[var(--line)]",
-  };
+  const meta =
+    type in SLOT_TYPE_META
+      ? SLOT_TYPE_META[type as SlotType]
+      : {
+          label: type,
+          icon: null,
+          color: "text-[var(--sea-ink-soft)]",
+          bg: "bg-[var(--line)]",
+        };
   return (
     <span
       className={`inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${meta.color} ${meta.bg}`}
@@ -237,8 +240,9 @@ function BookSlotPage() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                     {slots.map((slot) => {
                       const meta =
-                        SLOT_TYPE_META[slot.slotType as SlotType] ??
-                        SLOT_TYPE_META.standard;
+                        slot.slotType in SLOT_TYPE_META
+                          ? SLOT_TYPE_META[slot.slotType as SlotType]
+                          : SLOT_TYPE_META.standard;
                       const isSelected = selectedSlot === slot.id;
                       return (
                         <button
@@ -278,10 +282,9 @@ function BookSlotPage() {
                   {/* Legend */}
                   <div className="mt-5 pt-4 border-t border-[var(--line)] flex flex-wrap gap-3">
                     {(
-                      Object.entries(SLOT_TYPE_META) as [
-                        SlotType,
-                        (typeof SLOT_TYPE_META)[SlotType],
-                      ][]
+                      Object.entries(SLOT_TYPE_META) as Array<
+                        [SlotType, (typeof SLOT_TYPE_META)[SlotType]]
+                      >
                     ).map(([key, meta]) => (
                       <span
                         key={key}
