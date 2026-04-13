@@ -17,7 +17,9 @@ function VehiclesComponent() {
   const [model, setModel] = React.useState("");
   const [registering, setRegistering] = React.useState(false);
   const [registerError, setRegisterError] = React.useState<string | null>(null);
-  const [registerSuccess, setRegisterSuccess] = React.useState<string | null>(null);
+  const [registerSuccess, setRegisterSuccess] = React.useState<string | null>(
+    null,
+  );
 
   const fetchVehicles = async () => {
     try {

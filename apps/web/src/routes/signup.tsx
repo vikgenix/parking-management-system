@@ -1,7 +1,15 @@
 import * as React from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Lock, Mail, ParkingSquare, Phone, User } from "lucide-react";
-import { register, isAuthenticated } from "../lib/auth";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import {
+  Eye,
+  EyeOff,
+  Lock,
+  Mail,
+  ParkingSquare,
+  Phone,
+  User,
+} from "lucide-react";
+import { isAuthenticated, register } from "../lib/auth";
 
 export const Route = createFileRoute("/signup")({ component: SignupPage });
 

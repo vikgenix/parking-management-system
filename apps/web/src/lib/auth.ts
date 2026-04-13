@@ -54,7 +54,10 @@ export function clearUser(): void {
 }
 
 // ── Auth actions ──────────────────────────────────────────────────────────────
-export async function login(email: string, password: string): Promise<AuthUser> {
+export async function login(
+  email: string,
+  password: string,
+): Promise<AuthUser> {
   const data = await fetchApi("/auth/login", {
     method: "POST",
     body: JSON.stringify({ email, password }),

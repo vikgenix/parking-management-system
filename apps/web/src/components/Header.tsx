@@ -1,8 +1,7 @@
-
 import { Bell, Search, User } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import ThemeToggle from "./ThemeToggle";
 import { getUser, logout } from "../lib/auth";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Header() {
   const navigate = useNavigate();

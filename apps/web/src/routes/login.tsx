@@ -1,7 +1,7 @@
 import * as React from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Eye, EyeOff, Lock, Mail, ParkingSquare } from "lucide-react";
-import { login, isAuthenticated } from "../lib/auth";
+import { isAuthenticated, login } from "../lib/auth";
 
 export const Route = createFileRoute("/login")({ component: LoginPage });
 

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { CalendarCheck, RefreshCw } from "lucide-react";
-import { adminApi, type RecentBooking } from "../lib/api";
+import { adminApi } from "../lib/api";
+import type { RecentBooking } from "../lib/api";
 
 export const Route = createFileRoute("/bookings")({ component: BookingsPage });
 
@@ -43,7 +44,7 @@ function getInitials(name: string) {
 }
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = React.useState<RecentBooking[]>([]);
+  const [bookings, setBookings] = React.useState<Array<RecentBooking>>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [limit, setLimit] = React.useState(20);
@@ -66,7 +67,15 @@ export default function BookingsPage() {
     fetchBookings();
   }, [limit]);
 
-  const statuses = ["all", "active", "confirmed", "pending", "completed", "cancelled", "expired"];
+  const statuses = [
+    "all",
+    "active",
+    "confirmed",
+    "pending",
+    "completed",
+    "cancelled",
+    "expired",
+  ];
 
   const filtered =
     statusFilter === "all"
@@ -117,23 +126,25 @@ export default function BookingsPage() {
       {/* Summary Cards */}
       {!loading && (
         <div className="flex flex-wrap gap-3">
-          {statuses.filter((s) => s !== "all").map((s) => (
-            <button
-              key={s}
-              id={`filter-${s}`}
-              onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize border transition-all ${
-                statusFilter === s
-                  ? (STATUS_STYLES[s] ?? "bg-gray-500/10 text-gray-500")
-                  : "bg-[var(--surface)] border-[var(--line)] text-[var(--sea-ink-soft)] hover:border-indigo-500/30"
-              }`}
-            >
-              {s}
-              {counts[s] ? (
-                <span className="ml-2 opacity-70">{counts[s]}</span>
-              ) : null}
-            </button>
-          ))}
+          {statuses
+            .filter((s) => s !== "all")
+            .map((s) => (
+              <button
+                key={s}
+                id={`filter-${s}`}
+                onClick={() => setStatusFilter(statusFilter === s ? "all" : s)}
+                className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize border transition-all ${
+                  statusFilter === s
+                    ? (STATUS_STYLES[s] ?? "bg-gray-500/10 text-gray-500")
+                    : "bg-[var(--surface)] border-[var(--line)] text-[var(--sea-ink-soft)] hover:border-indigo-500/30"
+                }`}
+              >
+                {s}
+                {counts[s] ? (
+                  <span className="ml-2 opacity-70">{counts[s]}</span>
+                ) : null}
+              </button>
+            ))}
           {statusFilter !== "all" && (
             <button
               onClick={() => setStatusFilter("all")}

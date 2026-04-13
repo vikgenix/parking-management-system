@@ -4,7 +4,8 @@ const API_PREFIX = "/api";
 const API_URL = API_BASE_URL + API_PREFIX;
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
-  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   const headers = {
     "Content-Type": "application/json",
@@ -137,11 +138,13 @@ export const adminApi = {
   // Dashboard
   getDashboardStats: (): Promise<{ stats: DashboardStats }> =>
     fetchApi("/admin/stats"),
-  getRecentBookings: (limit = 10): Promise<{ bookings: RecentBooking[] }> =>
+  getRecentBookings: (
+    limit = 10,
+  ): Promise<{ bookings: Array<RecentBooking> }> =>
     fetchApi(`/admin/bookings/recent?limit=${limit}`),
 
   // Users
-  getUsers: (): Promise<{ users: AdminUser[] }> => fetchApi("/admin/user"),
+  getUsers: (): Promise<{ users: Array<AdminUser> }> => fetchApi("/admin/user"),
 
   // Parking Lots
   createParkingLot: (data: { name: string; address: string }) =>
@@ -178,18 +181,28 @@ export const adminApi = {
 
 // ── Booking API ─────────────────────────────────────────────────────────────
 export const bookingApi = {
-  getAvailableSlots: (): Promise<{ slots: Array<Slot & { floor: { name: string; level: number; parkingLot: { name: string } } }> }> =>
-    fetchApi("/booking/available-slots"),
-  
-  createBooking: (data: { vehicleId: string; slotId: string; startTime: string; endTime: string }) =>
+  getAvailableSlots: (): Promise<{
+    slots: Array<
+      Slot & {
+        floor: { name: string; level: number; parkingLot: { name: string } };
+      }
+    >;
+  }> => fetchApi("/booking/available-slots"),
+
+  createBooking: (data: {
+    vehicleId: string;
+    slotId: string;
+    startTime: string;
+    endTime: string;
+  }) =>
     fetchApi("/booking", {
       method: "POST",
       body: JSON.stringify(data),
     }),
-  
-  getMyBookings: (): Promise<{ bookings: any[] }> => fetchApi("/booking/my-bookings"),
-  
+
+  getMyBookings: (): Promise<{ bookings: Array<any> }> =>
+    fetchApi("/booking/my-bookings"),
+
   payBooking: (id: string) =>
     fetchApi(`/booking/${id}/pay`, { method: "POST" }),
 };
-

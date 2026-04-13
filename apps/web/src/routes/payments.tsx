@@ -8,7 +8,8 @@ import {
   RefreshCw,
   TrendingUp,
 } from "lucide-react";
-import { adminApi, type DashboardStats, type RecentBooking } from "../lib/api";
+import { adminApi } from "../lib/api";
+import type { DashboardStats, RecentBooking } from "../lib/api";
 
 export const Route = createFileRoute("/payments")({ component: PaymentsPage });
 
@@ -48,7 +49,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 function PaymentsPage() {
   const [stats, setStats] = React.useState<DashboardStats | null>(null);
-  const [bookings, setBookings] = React.useState<RecentBooking[]>([]);
+  const [bookings, setBookings] = React.useState<Array<RecentBooking>>([]);
   const [loadingStats, setLoadingStats] = React.useState(true);
   const [loadingBookings, setLoadingBookings] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -63,7 +64,9 @@ function PaymentsPage() {
         adminApi.getRecentBookings(50),
       ]);
       setStats(statsRes.stats);
-      setBookings(Array.isArray(bookingsRes.bookings) ? bookingsRes.bookings : []);
+      setBookings(
+        Array.isArray(bookingsRes.bookings) ? bookingsRes.bookings : [],
+      );
     } catch (err: any) {
       setError(err.message || "Failed to load payment data");
     } finally {
@@ -118,9 +121,7 @@ function PaymentsPage() {
         <MetricCard
           title="Revenue Today"
           value={
-            loadingStats
-              ? "—"
-              : formatCurrency(stats?.totalRevenueToday ?? 0)
+            loadingStats ? "—" : formatCurrency(stats?.totalRevenueToday ?? 0)
           }
           icon={<Banknote size={20} />}
           color="text-emerald-500"
@@ -163,7 +164,9 @@ function PaymentsPage() {
           {/* Big number */}
           <div className="flex-1">
             <p className="text-5xl font-bold text-[var(--sea-ink)] tracking-tight">
-              {loadingStats ? "…" : formatCurrency(stats?.totalRevenueToday ?? 0)}
+              {loadingStats
+                ? "…"
+                : formatCurrency(stats?.totalRevenueToday ?? 0)}
             </p>
             <p className="text-sm text-[var(--sea-ink-soft)] mt-2">
               Total completed payment revenue today
@@ -176,7 +179,7 @@ function PaymentsPage() {
                 Available Slots
               </p>
               <p className="text-2xl font-bold text-cyan-500">
-                {loadingStats ? "—" : stats?.availableSlots ?? "—"}
+                {loadingStats ? "—" : (stats?.availableSlots ?? "—")}
               </p>
             </div>
             <div className="space-y-1">
@@ -184,7 +187,7 @@ function PaymentsPage() {
                 Total Slots
               </p>
               <p className="text-2xl font-bold text-[var(--sea-ink)]">
-                {loadingStats ? "—" : stats?.totalSlots ?? "—"}
+                {loadingStats ? "—" : (stats?.totalSlots ?? "—")}
               </p>
             </div>
             <div className="space-y-1">
@@ -192,7 +195,7 @@ function PaymentsPage() {
                 Vehicles Parked
               </p>
               <p className="text-2xl font-bold text-indigo-500">
-                {loadingStats ? "—" : stats?.vehiclesParked ?? "—"}
+                {loadingStats ? "—" : (stats?.vehiclesParked ?? "—")}
               </p>
             </div>
             <div className="space-y-1">
@@ -203,12 +206,12 @@ function PaymentsPage() {
                 {loadingStats || !stats
                   ? "—"
                   : stats.totalSlots > 0
-                  ? `${Math.round(
-                      ((stats.totalSlots - stats.availableSlots) /
-                        stats.totalSlots) *
-                        100,
-                    )}%`
-                  : "0%"}
+                    ? `${Math.round(
+                        ((stats.totalSlots - stats.availableSlots) /
+                          stats.totalSlots) *
+                          100,
+                      )}%`
+                    : "0%"}
               </p>
             </div>
           </div>
