@@ -90,9 +90,9 @@ class BookingService implements IBookingService {
       include: {
         vehicle: true,
         slot: {
-          include: { floor: { include: { parkingLot: true } } }
+          include: { floor: { include: { parkingLot: true } } },
         },
-        payments: true
+        payments: true,
       },
     });
   }
@@ -106,7 +106,7 @@ class BookingService implements IBookingService {
     if (!booking) throw new Error("Booking not found");
     if (booking.status !== "pending") throw new Error("Booking is not pending payment");
 
-    const pendingPayment = booking.payments.find(p => p.status === "pending");
+    const pendingPayment = booking.payments.find((p) => p.status === "pending");
     if (!pendingPayment) throw new Error("No pending payment found for booking");
 
     // Process payment (mock)
