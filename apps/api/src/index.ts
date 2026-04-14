@@ -1,4 +1,4 @@
-import App from "@/app";
+import { App } from "@/app";
 import env from "@/constants/env";
 import { verifyDBConnection } from "@/lib/prisma";
 import router from "@/modules";
@@ -15,6 +15,8 @@ async function main() {
     env,
   );
   app.startServer();
+  return app.getApp();
 }
 
-main();
+const app = main();
+export default app;

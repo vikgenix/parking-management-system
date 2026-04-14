@@ -49,5 +49,9 @@ class App {
       console.info(`Server is running on http://localhost:${port}`);
     });
   }
+
+  public getApp() {
+    return this.app;
+  }
 }
-export default App;
+export { App };
