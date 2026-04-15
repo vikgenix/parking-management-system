@@ -1,7 +1,7 @@
 import * as React from "react";
 import {
-  createRootRoute,
   Outlet,
+  createRootRoute,
   useNavigate,
   useRouterState,
 } from "@tanstack/react-router";

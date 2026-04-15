@@ -1,57 +1,10 @@
-import cookieParser from "cookie-parser";
-import cors from "cors";
-import express from "express";
+import { App } from "@/server";
+import env from "@/constants/env";
+import { verifyDBConnection } from "@/lib/prisma";
+import router from "@/modules";
 
-import { EnvService } from "@/constants/env";
-import errorHandler from "@/middleware/errorHandler";
+const instance = new App([{ path: "/api", router }], env);
 
-export type Route = {
-  path: string;
-  router: express.Router;
-};
+export default instance.getApp();
 
-class App {
-  private app: express.Application;
-  private config: EnvService;
-
-  constructor(routes: Route[], config: EnvService) {
-    this.config = config;
-
-    this.app = express();
-    this.setupMiddleware();
-    this.setupRoutes(routes);
-    this.setupErrorHandling();
-  }
-
-  private setupMiddleware() {
-    this.app.use(
-      cors({
-        origin: this.config.get("APP_ORIGIN"),
-        credentials: true,
-      }),
-    );
-    this.app.use(express.json());
-    this.app.use(cookieParser());
-    this.app.set("trust proxy", 1);
-  }
-
-  private setupRoutes(routes: Route[]) {
-    routes.forEach((route) => this.app.use(route.path, route.router));
-  }
-
-  private setupErrorHandling() {
-    this.app.use(errorHandler);
-  }
-
-  public startServer() {
-    const port = this.config.get("PORT");
-    this.app.listen(port, () => {
-      console.info(`Server is running on http://localhost:${port}`);
-    });
-  }
-
-  public getApp() {
-    return this.app;
-  }
-}
-export { App };
+verifyDBConnection().catch(console.error);

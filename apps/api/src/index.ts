@@ -1,12 +1,21 @@
-import { App } from "@/app";
+import { App } from "@/server";
 import env from "@/constants/env";
 import { verifyDBConnection } from "@/lib/prisma";
 import router from "@/modules";
 
-verifyDBConnection().catch(console.error);
+async function main() {
+  await verifyDBConnection();
 
-const instance = new App([{ path: "/api", router }], env);
+  const app = new App(
+    [
+      {
+        path: "/api",
+        router,
+      },
+    ],
+    env,
+  );
+  app.startServer();
+}
 
-export default instance.getApp();
-
-instance.startServer();
+main();
