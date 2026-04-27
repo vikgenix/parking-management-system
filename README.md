@@ -1,5 +1,7 @@
 # Parking Management System
 
+> **📄 Formal Project Report:** [Download Project Report (PDF)](./docs/Project_Report.pdf)
+
 ---
 
 A full-stack enterprise parking management platform built with React, Express, TypeScript, and PostgreSQL. The system allows drivers to seamlessly browse available parking slots, securely book a space, and process simulated payments. On-site administrators can govern all physical infrastructure (Lots, Floors, Slots) and operationally track vehicular check-ins and check-outs in real-time.
